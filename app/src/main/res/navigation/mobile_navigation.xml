@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/mobile_navigation"
+            app:startDestination="@+id/navigation_edit">
+
+    <fragment
+            android:id="@+id/navigation_edit"
+            android:name="xyz.aiinirii.imarkdownx.ui.edit.EditFragment"
+            android:label="@string/nav_edit"
+            tools:layout="@layout/fragment_edit"/>
+
+    <fragment
+            android:id="@+id/navigation_todo"
+            android:name="xyz.aiinirii.imarkdownx.ui.todo.TodoFragment"
+            android:label="@string/nav_todo"
+            tools:layout="@layout/fragment_todo"/>
+
+    <fragment
+            android:id="@+id/navigation_my"
+            android:name="xyz.aiinirii.imarkdownx.ui.my.MyFragment"
+            android:label="@string/nav_my"
+            tools:layout="@layout/fragment_my"/>
+</navigation>
