@@ -3,13 +3,19 @@ package xyz.aiinirii.imarkdownx.ui.edit.main
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import io.noties.markwon.editor.MarkwonEditor
+import io.noties.markwon.editor.MarkwonEditorTextWatcher
+import kotlinx.android.synthetic.main.fragment_edit_main.*
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.databinding.FragmentEditMainBinding
 import xyz.aiinirii.imarkdownx.ui.edit.render.EditRenderActivity
+import xyz.aiinirii.imarkdownx.utils.MarkwonBuilder
 
 private const val TAG = "EditMainFragment"
 
@@ -37,33 +43,49 @@ class EditMainFragment : Fragment() {
         val extras: Bundle = activity?.intent?.extras!!
         val isNew = extras.getBoolean("is_new")
 
+        val viewModel = fragmentEditMainBinding.viewModel!!
         if (!isNew) {
             // if it is not new file, load it.
             val fileId = extras.getLong("file_id")
             Log.d(TAG, "onViewCreated: get file id $fileId")
-            val file = fragmentEditMainBinding.viewModel?.getFileById(fileId)
+            val file = viewModel.getFileById(fileId)
             if (file != null) {
                 file.observe(viewLifecycleOwner) {
                     Log.d(TAG, "onViewCreated: file content: ${it.content}")
-                    fragmentEditMainBinding.viewModel?.fileContent?.postValue(it.content)
-                    fragmentEditMainBinding.viewModel?.fileName?.postValue(it.name)
+                    viewModel.fileContent.postValue(it.content)
+                    viewModel.fileName.postValue(it.name)
                 }
             } else {
                 Log.w(TAG, "onViewCreated: can not file the file with this id")
             }
         }
 
+        // if saved, create a toast
+        viewModel.isSaved.observe(viewLifecycleOwner, {
+            if (it) {
+                val toast = Toast.makeText(context, getString(R.string.toast_saved_success), Toast.LENGTH_SHORT)
+                toast.setGravity(Gravity.TOP, 0, 0)
+                toast.show()
+                viewModel.isSaved.postValue(false)
+            }
+        })
+
         // set an observer to renderFile
-        fragmentEditMainBinding.viewModel?.renderFile?.observe(viewLifecycleOwner) {
+        viewModel.renderFile.observe(viewLifecycleOwner) {
             // if the renderFile arg change to true, got to EditRenderActivity
             if (it) {
                 Log.d(TAG, "onActivityCreated: create an intent to EditRenderActivity")
                 val intent = Intent(activity, EditRenderActivity::class.java)
-                intent.putExtra("file_title", fragmentEditMainBinding.viewModel?.fileName?.value)
-                intent.putExtra("file_content", fragmentEditMainBinding.viewModel?.fileContent?.value)
+                intent.putExtra("file_title", viewModel.fileName.value)
+                intent.putExtra("file_content", viewModel.fileContent.value)
                 startActivity(intent)
             }
         }
+
+        val markwon = MarkwonBuilder.markwon
+        val markwonEditor = MarkwonEditor.create(markwon)
+
+        edittext_edit_main.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(markwonEditor))
     }
 
 }

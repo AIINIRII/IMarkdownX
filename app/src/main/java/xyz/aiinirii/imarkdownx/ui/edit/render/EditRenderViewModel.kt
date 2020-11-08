@@ -12,9 +12,17 @@ class EditRenderViewModel : ViewModel() {
     val renderText: LiveData<Spanned>
         get() = _renderedText
 
+    private val _isBack = MutableLiveData<Boolean>()
+    val isBack: LiveData<Boolean>
+        get() = _isBack
+
     val fileTitle = MutableLiveData<String>()
 
     fun renderText(markwon: Markwon, content: String) {
         _renderedText.postValue(markwon.toMarkdown(content))
+    }
+
+    fun back() {
+        _isBack.postValue(false)
     }
 }

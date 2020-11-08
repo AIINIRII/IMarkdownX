@@ -20,4 +20,6 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="btn_save">save</string>
     <string name="btn_render">render</string>
+    <string name="btn_back">back</string>
+    <string name="toast_saved_success">saved successfully!</string>
 </resources>

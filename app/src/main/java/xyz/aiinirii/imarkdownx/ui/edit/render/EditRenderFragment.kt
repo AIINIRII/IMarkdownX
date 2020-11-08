@@ -1,6 +1,7 @@
 package xyz.aiinirii.imarkdownx.ui.edit.render
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,7 +9,9 @@ import androidx.fragment.app.Fragment
 import io.noties.markwon.Markwon
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.databinding.FragmentEditRenderBinding
+import xyz.aiinirii.imarkdownx.utils.MarkwonBuilder
 
+private const val TAG = "EditRenderFragment"
 class EditRenderFragment : Fragment() {
 
     lateinit var fragmentEditRenderBinding: FragmentEditRenderBinding
@@ -33,7 +36,8 @@ class EditRenderFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         // init markwon
-        markwon = Markwon.create(requireContext())
+        val viewModel = fragmentEditRenderBinding.viewModel!!
+        markwon = MarkwonBuilder.markwon
 
         val intent = requireActivity().intent
         val extras = intent.extras!!
@@ -41,9 +45,13 @@ class EditRenderFragment : Fragment() {
         val fileContent = extras.getString("file_content")
         val fileTitle = extras.getString("file_title")
 
-        fragmentEditRenderBinding.viewModel?.renderText(markwon, fileContent.toString())
-        fragmentEditRenderBinding.viewModel?.fileTitle?.postValue(fileTitle)
+        viewModel.isBack.observe(viewLifecycleOwner, {
+            requireActivity().finish()
+        })
 
+        viewModel.renderText(markwon, fileContent.toString())
+        Log.i(TAG, "onActivityCreated: fileContent rendered successfully")
+        viewModel.fileTitle.postValue(fileTitle)
     }
 
 }

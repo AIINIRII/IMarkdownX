@@ -81,4 +81,5 @@ dependencies {
 
     // android markdown library
     implementation "io.noties.markwon:core:4.6.0"
+    implementation 'io.noties.markwon:editor:4.6.0'
 }

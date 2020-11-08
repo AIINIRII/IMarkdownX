@@ -1,6 +1,7 @@
 package xyz.aiinirii.imarkdownx.ui.edit.main
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,9 @@ class EditMainViewModel : ViewModel() {
         private set
     val fileContent = MutableLiveData<String>()
     val fileName = MutableLiveData<String>()
+    val isSaved = MutableLiveData<Boolean>().apply {
+        this.postValue(false)
+    }
 
     private val _renderFile = MutableLiveData<Boolean>().apply {
         this.postValue(false)
@@ -74,7 +78,7 @@ class EditMainViewModel : ViewModel() {
             }
             Log.d(TAG, "saveFile: successfully save the file")
         }
+        isSaved.postValue(true)
     }
-
 
 }
