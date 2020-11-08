@@ -3,16 +3,23 @@ package xyz.aiinirii.imarkdownx.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import xyz.aiinirii.imarkdownx.R
-import xyz.aiinirii.imarkdownx.domain.FileItem
+import xyz.aiinirii.imarkdownx.entity.File
 
 /**
  *
  * @author AIINIRII
  */
-class FileItemAdapter(private var fileItemList: List<FileItem>?) : RecyclerView.Adapter<FileItemAdapter.ViewHolder>() {
+class FileItemAdapter(private var fileItemList: List<File>?) : RecyclerView.Adapter<FileItemAdapter.ViewHolder>() {
+
+    var onItemClickListener: OnItemClickListener? = null
+
+    interface OnItemClickListener {
+        fun onItemClick(view: View, position: Int)
+    }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val fileName: MaterialTextView = view.findViewById(R.id.file_name)
@@ -29,13 +36,19 @@ class FileItemAdapter(private var fileItemList: List<FileItem>?) : RecyclerView.
         val fileItem = fileItemList?.get(position)
         holder.fileName.text = fileItem?.name ?: ""
         holder.fileDate.text = fileItem?.date ?: ""
+        if (onItemClickListener != null) {
+            holder.itemView.setOnClickListener {
+                onItemClickListener!!.onItemClick(it, position)
+            }
+        }
     }
 
     override fun getItemCount(): Int = fileItemList?.size ?: 0
 
-    fun setFileItemList(value: List<FileItem>) {
+    fun setFileItemList(value: List<File>) {
         fileItemList = value
         notifyDataSetChanged()
     }
+
 
 }

@@ -13,20 +13,22 @@
             android:layout_height="wrap_content"
             android:id="@+id/appBarLayout">
 
-            <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar_edit"
-                    android:layout_width="match_parent"
-                    android:background="@android:color/transparent"
-                    app:titleTextColor="@color/colorText"
-                    app:navigationIcon="@drawable/side_nav_bar"
-                    android:layout_height="?attr/actionBarSize"
-                    android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
-                    app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
-                    app:menu="@menu/bottom_nav_menu"/>
+        <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar_edit"
+                android:layout_width="match_parent"
+                android:background="@android:color/transparent"
+                app:titleTextColor="@color/colorText"
+                app:navigationIcon="@drawable/side_nav_bar"
+                android:layout_height="?attr/actionBarSize"
+                android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+                app:menu="@menu/bottom_nav_menu"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
+
     <ScrollView
+            android:id="@+id/scrollView_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:layout_editor_absoluteX="16dp"
@@ -38,5 +40,15 @@
                 android:layout_height="wrap_content"/>
 
     </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/spacing_large"
+            android:src="@drawable/ic_add_item"
+            app:fabSize="normal"
+            app:layout_constraintEnd_toEndOf="@+id/scrollView_edit"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

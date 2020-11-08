@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+                name="viewModel"
+                type="xyz.aiinirii.imarkdownx.ui.edit.main.EditMainViewModel"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/edit_main"
+            tools:context=".ui.edit.main.EditMainFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edittext_title_edit_main"
+                android:inputType="text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/spacing_normal"
+                android:text="@={viewModel.fileName}"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="title"/>
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edittext_edit_main"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:text="@={viewModel.fileContent}"
+                android:inputType="textMultiLine"
+                android:gravity="start|top"
+                android:padding="@dimen/spacing_normal"
+                app:layout_constraintTop_toBottomOf="@+id/edittext_title_edit_main"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="content"
+                tools:layout_editor_absoluteX="-118dp"
+                app:layout_constraintVertical_bias="1.0"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_render"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{() -> viewModel.renderFile()}"
+                android:text="@string/btn_render"
+                android:layout_marginBottom="@dimen/spacing_large"
+                app:layout_constraintBottom_toBottomOf="@+id/edittext_edit_main"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.179"
+                app:layout_constraintEnd_toStartOf="@id/btn_save"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{() -> viewModel.saveFile()}"
+                android:text="@string/btn_save"
+                android:layout_marginBottom="@dimen/spacing_large"
+                app:layout_constraintBottom_toBottomOf="@+id/edittext_edit_main"
+                app:layout_constraintHorizontal_bias="0.808"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btn_render"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,5 +1,6 @@
 package xyz.aiinirii.imarkdownx.ui.edit
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,9 +11,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_edit.*
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.adapter.FileItemAdapter
+import xyz.aiinirii.imarkdownx.ui.edit.main.EditMainActivity
+
 
 class EditFragment : Fragment() {
 
@@ -44,14 +48,33 @@ class EditFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this, EditViewModelFactory).get(EditViewModel::class.java)
 
-        val fileItemAdapter = FileItemAdapter(viewModel.fileCatalog.value)
-        viewModel.fileCatalog.observe(this.viewLifecycleOwner) {
+        // init file item adapter
+        val fileItemAdapter = FileItemAdapter(viewModel.files.value)
+        viewModel.files.observe(this.viewLifecycleOwner) {
             fileItemAdapter.setFileItemList(it)
         }
+
+        // set action when click file item
+        fileItemAdapter.onItemClickListener = object : FileItemAdapter.OnItemClickListener {
+            override fun onItemClick(view: View, position: Int) {
+                val intent = Intent(activity, EditMainActivity::class.java)
+                intent.putExtra("is_new", false)
+                intent.putExtra("file_id", viewModel.files.value?.get(position)?.id)
+                startActivity(intent)
+            }
+        }
+
         // set recycler list view
         val linearLayoutManager = LinearLayoutManager(this.context)
         listview_files.layoutManager = linearLayoutManager
         listview_files.adapter = fileItemAdapter
+
+        // set action when click fab_add_task
+        fab_add_task.setOnClickListener {
+            val intent = Intent(activity, EditMainActivity::class.java)
+            intent.putExtra("is_new", true)
+            startActivity(intent)
+        }
     }
 
 }

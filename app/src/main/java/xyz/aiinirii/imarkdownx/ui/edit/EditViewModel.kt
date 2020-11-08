@@ -1,9 +1,14 @@
 package xyz.aiinirii.imarkdownx.ui.edit
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import xyz.aiinirii.imarkdownx.data.FileCatalogDataSource
-import xyz.aiinirii.imarkdownx.data.mock.FileCatalogMockRepository
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import xyz.aiinirii.imarkdownx.IMarkdownXApplication
+import xyz.aiinirii.imarkdownx.data.FileRepository
+import xyz.aiinirii.imarkdownx.db.AppDatabase
+import xyz.aiinirii.imarkdownx.entity.File
 
 /**
  * view model for edit page
@@ -11,19 +16,23 @@ import xyz.aiinirii.imarkdownx.data.mock.FileCatalogMockRepository
  * @property fileCatalog LiveData<List<FileItem>>
  * @constructor
  */
-class EditViewModel(
-    private val dataSource: FileCatalogDataSource
-) : ViewModel() {
-    val fileCatalog = dataSource.getFileCatalog()
+class EditViewModel : ViewModel() {
+    private val repository: FileRepository
+
+    val files: LiveData<List<File>>
+
+    init {
+        val fileDao = AppDatabase.getDatabase(IMarkdownXApplication.context).fileDao()
+        repository = FileRepository(fileDao)
+        files = repository.files
+    }
 }
 
 /**
  * Factory for [EditViewModel]
  */
-object EditViewModelFactory:ViewModelProvider.Factory{
-
-    private val dataSource = FileCatalogMockRepository()
+object EditViewModelFactory : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T = EditViewModel(dataSource) as T
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T = EditViewModel() as T
 }
