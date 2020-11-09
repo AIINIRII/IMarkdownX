@@ -60,6 +60,16 @@ class EditMainFragment : Fragment() {
             }
         }
 
+        val stateEditText = edittext_edit_main
+
+        btn_undo.setOnClickListener {
+            if (isNew) {
+                stateEditText.undo(false)
+            } else {
+                stateEditText.undo(true)
+            }
+        }
+
         // if saved, create a toast
         viewModel.isSaved.observe(viewLifecycleOwner, {
             if (it) {
@@ -86,6 +96,15 @@ class EditMainFragment : Fragment() {
         val markwonEditor = MarkwonEditor.create(markwon)
 
         edittext_edit_main.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(markwonEditor))
+
+        toolbar_edit.setNavigationOnClickListener {
+            requireActivity().finish()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        fragmentEditMainBinding.viewModel?.saveFile()
     }
 
 }

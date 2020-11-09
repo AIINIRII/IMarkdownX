@@ -22,4 +22,8 @@
     <string name="btn_render">render</string>
     <string name="btn_back">back</string>
     <string name="toast_saved_success">saved successfully!</string>
+    <string name="item_delete">delete</string>
+    <string name="hint_title">Title:</string>
+    <string name="hint_content">Content:</string>
+    <string name="btn_undo">undo</string>
 </resources>

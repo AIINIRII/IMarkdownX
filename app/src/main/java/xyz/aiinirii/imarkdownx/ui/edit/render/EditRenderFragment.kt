@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import io.noties.markwon.Markwon
+import kotlinx.android.synthetic.main.fragment_edit_render.*
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.databinding.FragmentEditRenderBinding
 import xyz.aiinirii.imarkdownx.utils.MarkwonBuilder
@@ -52,6 +53,9 @@ class EditRenderFragment : Fragment() {
         viewModel.renderText(markwon, fileContent.toString())
         Log.i(TAG, "onActivityCreated: fileContent rendered successfully")
         viewModel.fileTitle.postValue(fileTitle)
-    }
 
+        toolbar_edit.setNavigationOnClickListener {
+            requireActivity().finish()
+        }
+    }
 }

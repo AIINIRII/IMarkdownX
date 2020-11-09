@@ -14,21 +14,26 @@ private const val TAG = "FileRepository"
 
 class FileRepository(private val fileDao: FileDao) {
 
-    val files: LiveData<List<File>> = fileDao.loadAllFiles()
+    var files: LiveData<List<File>> = fileDao.loadAllFiles()
 
-    suspend fun insert(file: File) {
-        Log.d(TAG, "insert: begin to insert file")
-        fileDao.insertFile(file)
-        Log.d(TAG, "insert: successfully insert file")
+    suspend fun insert(file: File): Long {
+        Log.d(TAG, "insert: insert file")
+        return fileDao.insertFile(file)
     }
 
     suspend fun update(file: File) {
         Log.d(TAG, "update: begin to update the file")
         fileDao.updateFile(file)
-        Log.d(TAG, "update: successfully update the file")
     }
 
     fun get(fileId: Long): LiveData<File> = fileDao.findFileById(fileId)
 
+    fun refresh(){
+        files = fileDao.loadAllFiles()
+    }
+
+    suspend fun delete(deleteFile: File) {
+        fileDao.deleteFile(deleteFile)
+    }
 
 }

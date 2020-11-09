@@ -5,16 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_edit.*
+import xyz.aiinirii.imarkdownx.MainActivity
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.adapter.FileItemAdapter
+import xyz.aiinirii.imarkdownx.databinding.FragmentEditBinding
 import xyz.aiinirii.imarkdownx.ui.edit.main.EditMainActivity
 
 
@@ -24,13 +26,18 @@ class EditFragment : Fragment() {
         fun newInstance() = EditFragment()
     }
 
-    private lateinit var viewModel: EditViewModel
+    lateinit var fragmentEditBinding: FragmentEditBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_edit, container, false)
+        val root = inflater.inflate(R.layout.fragment_edit, container, false)
+        fragmentEditBinding = FragmentEditBinding.bind(root).apply {
+            this.viewModel = ViewModelProvider(requireActivity()).get(EditViewModel::class.java)
+            this.lifecycleOwner = viewLifecycleOwner
+        }
+        return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,7 +53,8 @@ class EditFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this, EditViewModelFactory).get(EditViewModel::class.java)
+
+        val viewModel = fragmentEditBinding.viewModel!!
 
         // init file item adapter
         val fileItemAdapter = FileItemAdapter(viewModel.files.value)
@@ -61,6 +69,27 @@ class EditFragment : Fragment() {
                 intent.putExtra("is_new", false)
                 intent.putExtra("file_id", viewModel.files.value?.get(position)?.id)
                 startActivity(intent)
+            }
+        }
+
+        // set action when long click file item
+        fileItemAdapter.onItemLongClickListener = object : FileItemAdapter.OnItemLongClickListener{
+            override fun onItemLongClick(view: View, position: Int) {
+                val popupMenu = PopupMenu(requireContext(), view)
+                popupMenu.menuInflater.inflate(R.menu.item_long_click_menu, popupMenu.menu)
+
+                //弹出式菜单的菜单项点击事件
+
+                //弹出式菜单的菜单项点击事件
+                popupMenu.setOnMenuItemClickListener {
+                    when (it.itemId){
+                        R.id.delete_item -> {
+                            viewModel.deleteItem(position)
+                        }
+                    }
+                    true
+                }
+                popupMenu.show()
             }
         }
 

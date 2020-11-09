@@ -1,13 +1,10 @@
 package xyz.aiinirii.imarkdownx.ui.edit.main
 
 import android.util.Log
-import android.widget.Toast
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.IMarkdownXApplication
+import xyz.aiinirii.imarkdownx.config.ParamsConfig
 import xyz.aiinirii.imarkdownx.data.FileRepository
 import xyz.aiinirii.imarkdownx.db.AppDatabase
 import xyz.aiinirii.imarkdownx.entity.File
@@ -19,10 +16,14 @@ private const val TAG = "EditMainViewModel"
 class EditMainViewModel : ViewModel() {
 
     private val repository: FileRepository
+
     lateinit var file: LiveData<File>
         private set
+
     val fileContent = MutableLiveData<String>()
+
     val fileName = MutableLiveData<String>()
+
     val isSaved = MutableLiveData<Boolean>().apply {
         this.postValue(false)
     }
@@ -71,10 +72,11 @@ class EditMainViewModel : ViewModel() {
         } else {
             Log.d(TAG, "saveFile: begin to create file")
             val currentFile =
-                File(fileName.value.toString(), simpleDateFormat.format(Date()), fileContent.value.toString())
+                File(fileName.value ?: "", simpleDateFormat.format(Date()), fileContent.value ?: "")
             Log.d(TAG, "saveFile: set content: ${currentFile.content}, set date: ${currentFile.date}")
             viewModelScope.launch {
-                repository.insert(currentFile)
+                currentFile.id = repository.insert(currentFile)
+                file = liveData { emit(currentFile) }
             }
             Log.d(TAG, "saveFile: successfully save the file")
         }

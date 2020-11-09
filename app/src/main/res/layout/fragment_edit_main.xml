@@ -19,26 +19,52 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <com.google.android.material.textfield.TextInputEditText
+
+        <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/appBarLayout">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@android:color/transparent"
+                    android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
+                    app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+                    app:navigationIcon="@drawable/ic_back"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <xyz.aiinirii.imarkdownx.widget.StateEditText
                 android:id="@+id/edittext_title_edit_main"
+                android:background="@color/colorWhiteLittleDark"
                 android:inputType="text"
+                android:paddingTop="@dimen/spacing_large"
+                android:paddingBottom="@dimen/spacing_small"
+                android:textSize="@dimen/font_larger"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/hint_title"
                 android:paddingHorizontal="@dimen/spacing_normal"
                 android:text="@={viewModel.fileName}"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/appBarLayout"
                 tools:text="title"/>
 
-        <com.google.android.material.textfield.TextInputEditText
+        <xyz.aiinirii.imarkdownx.widget.StateEditText
                 android:id="@+id/edittext_edit_main"
+                android:background="@color/colorWhite"
+                android:textSize="@dimen/font_large"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:hint="@string/hint_content"
                 android:text="@={viewModel.fileContent}"
                 android:inputType="textMultiLine"
                 android:gravity="start|top"
                 android:padding="@dimen/spacing_normal"
-                app:layout_constraintTop_toBottomOf="@+id/edittext_title_edit_main"
-                app:layout_constraintBottom_toTopOf="@id/btn_save"
+                app:layout_constraintTop_toBottomOf="@id/edittext_title_edit_main"
+                app:layout_constraintBottom_toTopOf="@id/btn_undo"
                 tools:text="content"
                 tools:layout_editor_absoluteX="-118dp"
                 app:layout_constraintVertical_bias="1.0"/>
@@ -50,18 +76,19 @@
                 android:onClick="@{() -> viewModel.renderFile()}"
                 android:text="@string/btn_render"
                 android:layout_marginVertical="@dimen/spacing_normal"
+                app:rippleColor="@color/colorDark"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintHorizontal_bias="0.179"
-                app:layout_constraintEnd_toStartOf="@id/btn_save"/>
+                app:layout_constraintEnd_toStartOf="@id/btn_undo"/>
 
         <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_save"
+                android:id="@+id/btn_undo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{() -> viewModel.saveFile()}"
-                android:text="@string/btn_save"
+                android:text="@string/btn_undo"
                 android:layout_marginVertical="@dimen/spacing_normal"
+                app:rippleColor="@color/colorDark"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHorizontal_bias="0.808"
                 app:layout_constraintEnd_toEndOf="parent"

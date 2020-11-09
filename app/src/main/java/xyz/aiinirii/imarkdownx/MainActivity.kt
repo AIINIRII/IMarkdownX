@@ -1,14 +1,13 @@
 package xyz.aiinirii.imarkdownx
 
 import android.os.Bundle
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import xyz.aiinirii.imarkdownx.ui.edit.EditViewModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,4 +22,5 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         navView.setupWithNavController(navController)
     }
+
 }

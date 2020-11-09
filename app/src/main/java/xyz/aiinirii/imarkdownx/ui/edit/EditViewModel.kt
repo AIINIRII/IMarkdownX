@@ -26,6 +26,16 @@ class EditViewModel : ViewModel() {
         repository = FileRepository(fileDao)
         files = repository.files
     }
+
+    fun deleteItem(position:Int) {
+        viewModelScope.launch {
+            val deleteFile = files.value?.get(position)
+            if (deleteFile != null) {
+                repository.delete(deleteFile)
+            }
+            repository.refresh()
+        }
+    }
 }
 
 /**

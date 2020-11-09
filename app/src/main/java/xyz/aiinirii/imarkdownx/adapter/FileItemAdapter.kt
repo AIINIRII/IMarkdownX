@@ -16,9 +16,14 @@ import xyz.aiinirii.imarkdownx.entity.File
 class FileItemAdapter(private var fileItemList: List<File>?) : RecyclerView.Adapter<FileItemAdapter.ViewHolder>() {
 
     var onItemClickListener: OnItemClickListener? = null
+    var onItemLongClickListener: OnItemLongClickListener? = null
 
     interface OnItemClickListener {
         fun onItemClick(view: View, position: Int)
+    }
+
+    interface OnItemLongClickListener{
+        fun onItemLongClick(view: View, position: Int)
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -41,6 +46,12 @@ class FileItemAdapter(private var fileItemList: List<File>?) : RecyclerView.Adap
                 onItemClickListener!!.onItemClick(it, position)
             }
         }
+        if (onItemLongClickListener!=null){
+            holder.itemView.setOnLongClickListener {
+                onItemLongClickListener!!.onItemLongClick(it, position)
+                true
+            }
+        }
     }
 
     override fun getItemCount(): Int = fileItemList?.size ?: 0
@@ -49,6 +60,5 @@ class FileItemAdapter(private var fileItemList: List<File>?) : RecyclerView.Adap
         fileItemList = value
         notifyDataSetChanged()
     }
-
 
 }
