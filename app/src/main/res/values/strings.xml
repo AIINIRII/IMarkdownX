@@ -26,4 +26,12 @@
     <string name="hint_title">Title:</string>
     <string name="hint_content">Content:</string>
     <string name="btn_undo">undo</string>
+    <string name="item_lock">lock</string>
+    <string name="item_set_password">set password</string>
+    <string name="item_private_mode">private mode</string>
+    <string name="toolbar_title_private_mode">private mode</string>
+    <string name="item_unlock">unlock</string>
+    <string name="item_exit_private_mode">exit private mode</string>
+    <string name="login_username">username:</string>
+    <string name="default_username">Guest</string>
 </resources>

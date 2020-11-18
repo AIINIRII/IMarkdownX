@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.IMarkdownXApplication
 import xyz.aiinirii.imarkdownx.data.FileRepository
+import xyz.aiinirii.imarkdownx.data.UserRepository
 import xyz.aiinirii.imarkdownx.db.AppDatabase
 import xyz.aiinirii.imarkdownx.entity.File
 
@@ -17,23 +18,50 @@ import xyz.aiinirii.imarkdownx.entity.File
  * @constructor
  */
 class EditViewModel : ViewModel() {
-    private val repository: FileRepository
+    private val fileRepository: FileRepository
+    private val userRepository: UserRepository
 
     val files: LiveData<List<File>>
 
     init {
         val fileDao = AppDatabase.getDatabase(IMarkdownXApplication.context).fileDao()
-        repository = FileRepository(fileDao)
-        files = repository.files
+        val userDao = AppDatabase.getDatabase(IMarkdownXApplication.context).userDao()
+        fileRepository = FileRepository(fileDao)
+        userRepository = UserRepository(userDao)
+        files = fileRepository.unlockedFile
     }
 
-    fun deleteItem(position:Int) {
+    fun deleteItem(position: Int) {
         viewModelScope.launch {
             val deleteFile = files.value?.get(position)
             if (deleteFile != null) {
-                repository.delete(deleteFile)
+                fileRepository.delete(deleteFile)
             }
-            repository.refresh()
+            fileRepository.refresh()
+        }
+    }
+
+    fun lockItem(position: Int) {
+        viewModelScope.launch {
+            val lockedFile = files.value?.get(position)
+            if (lockedFile != null) {
+                fileRepository.lock(lockedFile)
+            }
+            fileRepository.refresh()
+        }
+    }
+
+    suspend fun havePrivatePassword(userId: Long): Boolean {
+        return userRepository.havePrivatePassword(userId)
+    }
+
+    suspend fun verifyPrivatePassword(userLocalId: Long, privatePassword: String) =
+        userRepository.verifyPrivatePassword(userLocalId, privatePassword)
+
+
+    fun refresh() {
+        viewModelScope.launch {
+            fileRepository.refresh()
         }
     }
 }

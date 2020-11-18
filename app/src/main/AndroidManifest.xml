@@ -10,10 +10,9 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".ui.edit.render.EditRenderActivity">
-        </activity>
-        <activity android:name=".ui.edit.main.EditMainActivity">
-        </activity>
+        <activity android:name=".ui.edit.privacy.PrivacyActivity"/>
+        <activity android:name=".ui.edit.render.EditRenderActivity"/>
+        <activity android:name=".ui.edit.main.EditMainActivity"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

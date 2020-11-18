@@ -5,15 +5,17 @@
         <import type="android.view.View"/>
         <variable
                 name="viewModel"
-                type="xyz.aiinirii.imarkdownx.ui.edit.EditViewModel"/>
+                type="xyz.aiinirii.imarkdownx.ui.edit.privacy.PrivacyViewModel"/>
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
             xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/privacy"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".ui.edit.EditFragment">
+            tools:context=".ui.edit.privacy.PrivacyFragment">
 
         <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
@@ -25,11 +27,13 @@
                     android:id="@+id/toolbar_edit"
                     android:layout_width="match_parent"
                     android:background="@android:color/transparent"
+                    app:title="@string/toolbar_title_private_mode"
                     app:titleTextColor="@color/colorWhite"
                     android:layout_height="?attr/actionBarSize"
                     android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
                     app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
-                    app:menu="@menu/edit_menu"/>
+                    app:menu="@menu/privacy_menu"
+                    app:navigationIcon="@drawable/ic_back"/>
 
         </com.google.android.material.appbar.AppBarLayout>
 

@@ -1,7 +1,6 @@
 package xyz.aiinirii.imarkdownx.data.dao
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import xyz.aiinirii.imarkdownx.entity.File
 
@@ -13,7 +12,7 @@ import xyz.aiinirii.imarkdownx.entity.File
 interface FileDao {
 
     @Insert
-    suspend  fun insertFile(file: File): Long
+    suspend fun insertFile(file: File): Long
 
     @Update
     suspend fun updateFile(newFile: File)
@@ -26,4 +25,11 @@ interface FileDao {
 
     @Query("select * from File where id=:fileId")
     fun findFileById(fileId: Long): LiveData<File>
+
+    @Query("select * from File where not locked")
+    fun loadAllUnLockedFiles(): LiveData<List<File>>
+
+    @Query("select * from File where locked")
+    fun loadAllLockedFiles(): LiveData<List<File>>
+
 }

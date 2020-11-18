@@ -1,26 +1,37 @@
 package xyz.aiinirii.imarkdownx.ui.edit
 
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.textfield.TextInputEditText
 import kotlinx.android.synthetic.main.fragment_edit.*
-import xyz.aiinirii.imarkdownx.MainActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.adapter.FileItemAdapter
 import xyz.aiinirii.imarkdownx.databinding.FragmentEditBinding
 import xyz.aiinirii.imarkdownx.ui.edit.main.EditMainActivity
+import xyz.aiinirii.imarkdownx.ui.edit.privacy.PrivacyActivity
 
+private const val TAG = "EditFragment"
 
 class EditFragment : Fragment() {
+    lateinit var sharedPreferences: SharedPreferences
 
     companion object {
         fun newInstance() = EditFragment()
@@ -56,6 +67,9 @@ class EditFragment : Fragment() {
 
         val viewModel = fragmentEditBinding.viewModel!!
 
+        // get sharedPreferences
+        sharedPreferences = requireActivity().getSharedPreferences("IMarkdownX", Context.MODE_PRIVATE)
+
         // init file item adapter
         val fileItemAdapter = FileItemAdapter(viewModel.files.value)
         viewModel.files.observe(this.viewLifecycleOwner) {
@@ -73,24 +87,30 @@ class EditFragment : Fragment() {
         }
 
         // set action when long click file item
-        fileItemAdapter.onItemLongClickListener = object : FileItemAdapter.OnItemLongClickListener{
+        fileItemAdapter.onItemLongClickListener = object : FileItemAdapter.OnItemLongClickListener {
             override fun onItemLongClick(view: View, position: Int) {
                 val popupMenu = PopupMenu(requireContext(), view)
                 popupMenu.menuInflater.inflate(R.menu.item_long_click_menu, popupMenu.menu)
 
-                //弹出式菜单的菜单项点击事件
-
-                //弹出式菜单的菜单项点击事件
                 popupMenu.setOnMenuItemClickListener {
-                    when (it.itemId){
+                    when (it.itemId) {
                         R.id.delete_item -> {
                             viewModel.deleteItem(position)
+                        }
+                        R.id.lock_item -> {
+                            viewModel.lockItem(position)
                         }
                     }
                     true
                 }
                 popupMenu.show()
             }
+        }
+
+        // set refresh action
+        swipe_refresh_edit.setOnRefreshListener {
+            viewModel.refresh()
+            swipe_refresh_edit.isRefreshing = false
         }
 
         // set recycler list view
@@ -103,6 +123,46 @@ class EditFragment : Fragment() {
             val intent = Intent(activity, EditMainActivity::class.java)
             intent.putExtra("is_new", true)
             startActivity(intent)
+        }
+
+        // setup edit toolbar menu action
+        val view = LayoutInflater.from(activity).inflate(R.layout.dialog_private_valid, null)
+        toolbar_edit.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.private_mode -> {
+                    val userLocalId = sharedPreferences.getLong("userLocalId", -1L)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        if (viewModel.havePrivatePassword(userLocalId)) {
+                            AlertDialog.Builder(requireActivity())
+                                .setTitle("enter the password to private mode")
+                                .setView(view)
+                                .setPositiveButton("confirm") { _, _ ->
+                                    val password = view.findViewById<TextInputEditText>(R.id.dialog_password).text ?: ""
+                                    lifecycleScope.launch {
+                                        if (userLocalId != -1L) {
+                                            val verifyPrivatePassword =
+                                                viewModel.verifyPrivatePassword(userLocalId, password.toString())
+                                            if (verifyPrivatePassword) {
+                                                val intent = Intent(activity, PrivacyActivity::class.java)
+                                                Toast.makeText(context, "enter the private mode", Toast.LENGTH_SHORT)
+                                                startActivity(intent)
+                                            } else {
+                                                Toast.makeText(context, "password wrong", Toast.LENGTH_SHORT)
+                                            }
+                                        } else {
+                                            Log.e(TAG, "onActivityCreated: no user local id find")
+                                        }
+                                    }
+                                }
+                                .setNegativeButton("cancel") { _, _ -> }
+                                .show()
+                        } else {
+                            // todo 去设置密码
+                        }
+                    }
+                }
+            }
+            true
         }
     }
 

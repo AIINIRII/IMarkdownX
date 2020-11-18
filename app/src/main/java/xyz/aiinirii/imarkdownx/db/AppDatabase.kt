@@ -5,16 +5,19 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import xyz.aiinirii.imarkdownx.data.dao.FileDao
+import xyz.aiinirii.imarkdownx.data.dao.UserDao
 import xyz.aiinirii.imarkdownx.entity.File
+import xyz.aiinirii.imarkdownx.entity.User
 
 /**
  *
  * @author AIINIRII
  */
-@Database(version = 1, entities = [File::class])
+@Database(version = 3, entities = [File::class, User::class])
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun fileDao(): FileDao
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile
@@ -28,7 +31,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "imarkdownx_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 // return instance
                 instance

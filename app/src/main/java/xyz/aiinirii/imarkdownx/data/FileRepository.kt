@@ -14,7 +14,8 @@ private const val TAG = "FileRepository"
 
 class FileRepository(private val fileDao: FileDao) {
 
-    var files: LiveData<List<File>> = fileDao.loadAllFiles()
+    var unlockedFile: LiveData<List<File>> = fileDao.loadAllUnLockedFiles()
+    var lockedFile: LiveData<List<File>> = fileDao.loadAllLockedFiles()
 
     suspend fun insert(file: File): Long {
         Log.d(TAG, "insert: insert file")
@@ -26,14 +27,27 @@ class FileRepository(private val fileDao: FileDao) {
         fileDao.updateFile(file)
     }
 
+    suspend fun lock(file: File) {
+        Log.d(TAG, "lock: lock the file")
+        file.locked = true
+        fileDao.updateFile(file)
+    }
+
     fun get(fileId: Long): LiveData<File> = fileDao.findFileById(fileId)
 
     fun refresh(){
-        files = fileDao.loadAllFiles()
+        unlockedFile = fileDao.loadAllUnLockedFiles()
+        lockedFile = fileDao.loadAllLockedFiles()
     }
 
     suspend fun delete(deleteFile: File) {
         fileDao.deleteFile(deleteFile)
+    }
+
+    suspend fun unlock(file: File) {
+        Log.d(TAG, "unLock: unlock the file")
+        file.locked = false
+        fileDao.updateFile(file)
     }
 
 }
