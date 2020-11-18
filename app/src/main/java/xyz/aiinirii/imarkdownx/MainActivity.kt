@@ -1,13 +1,16 @@
 package xyz.aiinirii.imarkdownx
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import xyz.aiinirii.imarkdownx.data.dao.UserDao
 import xyz.aiinirii.imarkdownx.db.AppDatabase
 import xyz.aiinirii.imarkdownx.entity.User
 
@@ -29,14 +32,28 @@ class MainActivity : AppCompatActivity() {
         val userLocalId = sharedPreferences.getLong("userLocalId", -1)
         val userDao = AppDatabase.getDatabase(applicationContext).userDao()
         if (userLocalId == -1L) {
-            lifecycleScope.launch {
-                val newUserId = userDao.insertUser(User(getString(R.string.default_username), ""))
-                sharedPreferences.edit()
-                    .putLong("userLocalId", newUserId)
-                    .putString("userLocalName", "Guest")
-                    .commit()
+            lifecycleScope.launch(Dispatchers.IO) {
+                addGuestAsUser(userDao, sharedPreferences)
+            }
+        } else {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val user = userDao.findUserById(userLocalId)
+                if (user == null) {
+                    addGuestAsUser(userDao, sharedPreferences)
+                }
             }
         }
+    }
+
+    private suspend fun addGuestAsUser(
+        userDao: UserDao,
+        sharedPreferences: SharedPreferences
+    ) {
+        val newUserId = userDao.insertUser(User(getString(R.string.default_username), ""))
+        sharedPreferences.edit()
+            .putLong("userLocalId", newUserId)
+            .putString("userLocalName", "Guest")
+            .commit()
     }
 
 }

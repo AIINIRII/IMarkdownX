@@ -1,9 +1,7 @@
 package xyz.aiinirii.imarkdownx.ui.edit
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.IMarkdownXApplication
 import xyz.aiinirii.imarkdownx.data.FileRepository
@@ -23,6 +21,12 @@ class EditViewModel : ViewModel() {
 
     val files: LiveData<List<File>>
 
+    val privatePasswordVerified = MutableLiveData<Int>().apply { this.postValue(0) }
+
+    private val _isHavePrivatePassword = MutableLiveData<Int>().apply { this.postValue(0) }
+    val isHavePrivatePassword: LiveData<Int>
+        get() = _isHavePrivatePassword
+
     init {
         val fileDao = AppDatabase.getDatabase(IMarkdownXApplication.context).fileDao()
         val userDao = AppDatabase.getDatabase(IMarkdownXApplication.context).userDao()
@@ -31,8 +35,18 @@ class EditViewModel : ViewModel() {
         files = fileRepository.unlockedFile
     }
 
+    fun checkPrivatePassword(userLocalId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (havePrivatePassword(userLocalId)) {
+                _isHavePrivatePassword.postValue(1)
+            } else {
+                _isHavePrivatePassword.postValue(2)
+            }
+        }
+    }
+
     fun deleteItem(position: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val deleteFile = files.value?.get(position)
             if (deleteFile != null) {
                 fileRepository.delete(deleteFile)
@@ -42,7 +56,7 @@ class EditViewModel : ViewModel() {
     }
 
     fun lockItem(position: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val lockedFile = files.value?.get(position)
             if (lockedFile != null) {
                 fileRepository.lock(lockedFile)
@@ -51,7 +65,7 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    suspend fun havePrivatePassword(userId: Long): Boolean {
+    private suspend fun havePrivatePassword(userId: Long): Boolean {
         return userRepository.havePrivatePassword(userId)
     }
 
@@ -60,7 +74,7 @@ class EditViewModel : ViewModel() {
 
 
     fun refresh() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             fileRepository.refresh()
         }
     }

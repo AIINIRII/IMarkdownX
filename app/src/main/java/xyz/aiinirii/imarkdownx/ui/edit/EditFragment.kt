@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.adapter.FileItemAdapter
 import xyz.aiinirii.imarkdownx.databinding.FragmentEditBinding
+import xyz.aiinirii.imarkdownx.ui.changeprivatepassword.ChangePrivatePasswordActivity
 import xyz.aiinirii.imarkdownx.ui.edit.main.EditMainActivity
 import xyz.aiinirii.imarkdownx.ui.edit.privacy.PrivacyActivity
 
@@ -69,6 +70,8 @@ class EditFragment : Fragment() {
 
         // get sharedPreferences
         sharedPreferences = requireActivity().getSharedPreferences("IMarkdownX", Context.MODE_PRIVATE)
+        // load user local id
+        val userLocalId = sharedPreferences.getLong("userLocalId", -1L)
 
         // init file item adapter
         val fileItemAdapter = FileItemAdapter(viewModel.files.value)
@@ -125,41 +128,63 @@ class EditFragment : Fragment() {
             startActivity(intent)
         }
 
-        // setup edit toolbar menu action
+        // setup when verified password's logic
+        viewModel.privatePasswordVerified.observe(viewLifecycleOwner) {
+            if (it == 1) {
+                val intent = Intent(activity, PrivacyActivity::class.java)
+                Toast.makeText(context, "enter the private mode", Toast.LENGTH_SHORT).show()
+                startActivity(intent)
+            } else if (it == 2) {
+                Toast.makeText(context, "password wrong", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // setup is have private password logic
+        viewModel.isHavePrivatePassword.observe(viewLifecycleOwner) { isHavePrivatePassword ->
         val view = LayoutInflater.from(activity).inflate(R.layout.dialog_private_valid, null)
+            when (isHavePrivatePassword) {
+                // if the user have the private password
+                1 -> {
+                    // alert a dialog and let user enter
+                    AlertDialog.Builder(requireActivity())
+                        .setTitle("enter the password to private mode")
+                        .setView(view)
+                        .setPositiveButton("confirm") { _, _ ->
+                            val password = view.findViewById<TextInputEditText>(R.id.dialog_password).text ?: ""
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                if (userLocalId != -1L) {
+                                    val verifyPrivatePassword =
+                                        viewModel.verifyPrivatePassword(userLocalId, password.toString())
+                                    if (verifyPrivatePassword) {
+                                        viewModel.privatePasswordVerified.postValue(1)
+                                    } else {
+                                        viewModel.privatePasswordVerified.postValue(2)
+                                    }
+                                } else {
+                                    Log.e(TAG, "onActivityCreated: no user local id find")
+                                }
+                            }
+                        }
+                        .setNegativeButton("cancel") { _, _ -> }
+                        .show()
+                }
+                // if the user do not have the private password
+                2 -> {
+                    val intent = Intent(activity, ChangePrivatePasswordActivity::class.java)
+                    intent.putExtra("is_new", true)
+                    startActivity(intent)
+                }
+                else -> {
+                    Log.e(TAG, "onActivityCreated: no such value for is have private password")
+                }
+            }
+        }
+
+        // setup edit toolbar menu action
         toolbar_edit.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.private_mode -> {
-                    val userLocalId = sharedPreferences.getLong("userLocalId", -1L)
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        if (viewModel.havePrivatePassword(userLocalId)) {
-                            AlertDialog.Builder(requireActivity())
-                                .setTitle("enter the password to private mode")
-                                .setView(view)
-                                .setPositiveButton("confirm") { _, _ ->
-                                    val password = view.findViewById<TextInputEditText>(R.id.dialog_password).text ?: ""
-                                    lifecycleScope.launch {
-                                        if (userLocalId != -1L) {
-                                            val verifyPrivatePassword =
-                                                viewModel.verifyPrivatePassword(userLocalId, password.toString())
-                                            if (verifyPrivatePassword) {
-                                                val intent = Intent(activity, PrivacyActivity::class.java)
-                                                Toast.makeText(context, "enter the private mode", Toast.LENGTH_SHORT)
-                                                startActivity(intent)
-                                            } else {
-                                                Toast.makeText(context, "password wrong", Toast.LENGTH_SHORT)
-                                            }
-                                        } else {
-                                            Log.e(TAG, "onActivityCreated: no user local id find")
-                                        }
-                                    }
-                                }
-                                .setNegativeButton("cancel") { _, _ -> }
-                                .show()
-                        } else {
-                            // todo 去设置密码
-                        }
-                    }
+                    viewModel.checkPrivatePassword(userLocalId)
                 }
             }
             true

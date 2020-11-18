@@ -34,4 +34,11 @@
     <string name="item_exit_private_mode">exit private mode</string>
     <string name="login_username">username:</string>
     <string name="default_username">Guest</string>
+    <string name="label_change_private_password_confirm">confirm:</string>
+    <string name="label_change_private_password_new_password">new password:</string>
+    <string name="label_change_private_password_origin_password">origin password:</string>
+    <string name="btn_confirm">confirm</string>
+    <string name="btn_cancel">cancel</string>
+    <string name="toast_success_change_psw">change private password successfully</string>
+    <string name="toast_failed_change_psw">change private password failed</string>
 </resources>

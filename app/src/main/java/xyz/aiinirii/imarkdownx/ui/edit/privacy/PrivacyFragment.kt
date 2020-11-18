@@ -1,10 +1,12 @@
 package xyz.aiinirii.imarkdownx.ui.edit.privacy
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +15,7 @@ import kotlinx.android.synthetic.main.fragment_edit.*
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.adapter.FileItemAdapter
 import xyz.aiinirii.imarkdownx.databinding.FragmentPrivacyBinding
+import xyz.aiinirii.imarkdownx.ui.changeprivatepassword.ChangePrivatePasswordActivity
 import xyz.aiinirii.imarkdownx.ui.edit.main.EditMainActivity
 
 class PrivacyFragment : Fragment() {
@@ -101,11 +104,9 @@ class PrivacyFragment : Fragment() {
         toolbar_edit.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.lock_password_setting -> {
-                    /*
-                     todo 设置用户密码
-                     1. 确认用户旧密码
-                     2. 修改密码
-                     */
+                    val intent = Intent(activity, ChangePrivatePasswordActivity::class.java)
+                    intent.putExtra("is_new", false)
+                    startActivityForResult(intent, 1)
                 }
             }
             true
@@ -117,4 +118,21 @@ class PrivacyFragment : Fragment() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            1 -> if (resultCode == RESULT_OK) {
+                val result = data?.getBooleanExtra("isSuccess", false) ?: false
+                if (result) {
+                    Toast
+                        .makeText(requireContext(), getString(R.string.toast_success_change_psw), Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    Toast
+                        .makeText(requireContext(), getString(R.string.toast_failed_change_psw), Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    }
 }
