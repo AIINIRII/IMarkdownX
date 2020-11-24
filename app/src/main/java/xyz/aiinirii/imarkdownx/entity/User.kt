@@ -8,8 +8,12 @@ import androidx.room.PrimaryKey
  * @author AIINIRII
  */
 @Entity
-class User (var username: String, var privatePassword: String){
+class User(var username: String, var privatePassword: String) {
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
+
+    override fun toString(): String {
+        return "User(username='$username', privatePassword='$privatePassword', id=$id)"
+    }
 }

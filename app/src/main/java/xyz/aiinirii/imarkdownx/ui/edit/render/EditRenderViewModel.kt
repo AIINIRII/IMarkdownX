@@ -9,7 +9,7 @@ import io.noties.markwon.Markwon
 class EditRenderViewModel : ViewModel() {
 
     private val _renderedText = MutableLiveData<Spanned>()
-    val renderText: LiveData<Spanned>
+    val renderedText: LiveData<Spanned>
         get() = _renderedText
 
     private val _isBack = MutableLiveData<Boolean>()
@@ -19,7 +19,8 @@ class EditRenderViewModel : ViewModel() {
     val fileTitle = MutableLiveData<String>()
 
     fun renderText(markwon: Markwon, content: String) {
-        _renderedText.postValue(markwon.toMarkdown(content))
+        val node = markwon.parse(content)
+        _renderedText.postValue(markwon.render(node))
     }
 
     fun back() {

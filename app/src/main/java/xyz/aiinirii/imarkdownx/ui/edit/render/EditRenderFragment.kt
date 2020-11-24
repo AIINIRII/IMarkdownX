@@ -13,6 +13,7 @@ import xyz.aiinirii.imarkdownx.databinding.FragmentEditRenderBinding
 import xyz.aiinirii.imarkdownx.utils.MarkwonBuilder
 
 private const val TAG = "EditRenderFragment"
+
 class EditRenderFragment : Fragment() {
 
     lateinit var fragmentEditRenderBinding: FragmentEditRenderBinding
@@ -45,6 +46,10 @@ class EditRenderFragment : Fragment() {
 
         val fileContent = extras.getString("file_content")
         val fileTitle = extras.getString("file_title")
+
+        viewModel.renderedText.observe(viewLifecycleOwner, {
+            markwon.setParsedMarkdown(textview_rendered, it)
+        })
 
         viewModel.isBack.observe(viewLifecycleOwner, {
             requireActivity().finish()

@@ -58,15 +58,24 @@ class ChangePrivatePasswordViewModel : ViewModel() {
             val currentNewPassword = newPassword.value
 
             val userId = sharedPreferences.getLong("userLocalId", -1L)
+            Log.i(TAG, "changePassword: user id: $userId")
             if (userId != -1L) {
                 if (userRepository.verifyPrivatePassword(userId, currentOriginPassword!!)) {
                     val user = userRepository.get(userId)
+                    Log.d(TAG, "changePassword: user: $user")
                     if (user != null) {
                         userRepository.savePrivatePassword(user, currentNewPassword!!)
                         _isChangingSuccess.postValue(true)
                         Log.i(TAG, "changePassword: correct password")
                         return@launch
                     }
+                } else {
+                    Log.d(
+                        TAG,
+                        "changePassword: verify password failed, with password: $currentOriginPassword, user password: ${
+                            userRepository.get(userId)?.privatePassword
+                        }"
+                    )
                 }
             } else {
                 Log.e(TAG, "changePassword: can not find user id")

@@ -1,7 +1,6 @@
 package xyz.aiinirii.imarkdownx.data
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import xyz.aiinirii.imarkdownx.data.dao.UserDao
 import xyz.aiinirii.imarkdownx.entity.User
 import xyz.aiinirii.imarkdownx.utils.MD5Utils
@@ -31,17 +30,17 @@ class UserRepository(private val userDao: UserDao) {
         userDao.deleteUser(deleteUser)
     }
 
-   suspend fun verifyPrivatePassword(userId: Long, privatePassword: String): Boolean {
+    suspend fun verifyPrivatePassword(userId: Long, privatePassword: String): Boolean {
         val user = get(userId)
-        return user?.let {  MD5Utils.verifyMd5Code(privatePassword, it.privatePassword)}?:false
+        return user?.let { MD5Utils.verifyMd5Code(privatePassword, it.privatePassword) } ?: false
     }
 
-   suspend fun havePrivatePassword(userId: Long):Boolean {
+    suspend fun havePrivatePassword(userId: Long): Boolean {
         val user = get(userId)
-        return user?.privatePassword != ""
+        return user?.privatePassword != MD5Utils.getMD5Code("")
     }
 
-    suspend fun savePrivatePassword(user: User, privatePassword: String){
+    suspend fun savePrivatePassword(user: User, privatePassword: String) {
         Log.d(TAG, "savePrivatePassword: begin to save password")
         val md5Password = MD5Utils.getMD5Code(privatePassword)
         user.privatePassword = md5Password

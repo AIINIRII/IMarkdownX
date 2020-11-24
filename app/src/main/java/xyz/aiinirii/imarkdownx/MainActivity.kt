@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.data.dao.UserDao
 import xyz.aiinirii.imarkdownx.db.AppDatabase
 import xyz.aiinirii.imarkdownx.entity.User
+import xyz.aiinirii.imarkdownx.utils.MD5Utils
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         userDao: UserDao,
         sharedPreferences: SharedPreferences
     ) {
-        val newUserId = userDao.insertUser(User(getString(R.string.default_username), ""))
+        val newUserId = userDao.insertUser(User(getString(R.string.default_username), MD5Utils.getMD5Code("")))
         sharedPreferences.edit()
             .putLong("userLocalId", newUserId)
             .putString("userLocalName", "Guest")

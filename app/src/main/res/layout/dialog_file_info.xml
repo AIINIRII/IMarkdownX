@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="xyz.aiinirii.imarkdownx.ui.edit.main.EditMainViewModel" />
+    </data>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorLight"
+            android:paddingHorizontal="@dimen/spacing_large"
+            android:paddingVertical="@dimen/spacing_small"
+            android:text="@string/title_import_image_from"
+            android:textSize="@dimen/font_large" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/btn_from_photo"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_normal"
+            android:layout_below="@id/title"
+            android:background="@drawable/btn_white"
+            android:gravity="center"
+            android:onClick="@{()->viewModel.loadFromPhoto()}"
+            android:text="@string/btn_from_photo"
+            android:textSize="@dimen/font_large" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/btn_from_internet"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_normal"
+            android:layout_below="@id/btn_from_photo"
+            android:background="@drawable/btn_white"
+            android:gravity="center"
+            android:onClick="@{()->viewModel.loadFromInternet()}"
+            android:text="@string/btn_from_internet"
+            android:textSize="@dimen/font_large" />
+
+    </RelativeLayout>
+</layout>

@@ -41,4 +41,26 @@
     <string name="btn_cancel">cancel</string>
     <string name="toast_success_change_psw">change private password successfully</string>
     <string name="toast_failed_change_psw">change private password failed</string>
+    <string name="btn_redo">redo</string>
+    <string name="btn_underline">underline</string>
+    <string name="btn_bold">bold</string>
+    <string name="btn_italic">italic</string>
+    <string name="btn_file">file</string>
+    <string name="btn_code">code</string>
+    <string name="btn_left_indent">left_indent</string>
+    <string name="btn_right_indent">right indent</string>
+    <string name="btn_link">link</string>
+    <string name="btn_link_alt">link_alt</string>
+    <string name="btn_list">list</string>
+    <string name="btn_table">table</string>
+    <string name="dialog_row_number">row:</string>
+    <string name="dialog_col_number">col:</string>
+    <string name="btn_from_photo">from photo</string>
+    <string name="btn_from_internet">input by myself</string>
+    <string name="title_enter_table_info">Enter table info</string>
+    <string name="title_import_image_from">Import image from..</string>
+    <string name="title_enter_privacy_mode_password">Enter privacy mode password:</string>
+    <string name="toast_privacy_mode">privacy mode</string>
+    <string name="toast_password_wrong">password wrong</string>
+    <string name="btn_hr">hr</string>
 </resources>

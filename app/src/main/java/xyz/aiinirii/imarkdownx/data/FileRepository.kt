@@ -35,7 +35,7 @@ class FileRepository(private val fileDao: FileDao) {
 
     fun get(fileId: Long): LiveData<File> = fileDao.findFileById(fileId)
 
-    fun refresh(){
+    fun refresh() {
         unlockedFile = fileDao.loadAllUnLockedFiles()
         lockedFile = fileDao.loadAllLockedFiles()
     }

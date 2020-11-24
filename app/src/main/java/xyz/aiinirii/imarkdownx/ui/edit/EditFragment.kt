@@ -19,6 +19,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.android.synthetic.main.dialog_private_valid.view.*
 import kotlinx.android.synthetic.main.fragment_edit.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -125,6 +126,7 @@ class EditFragment : Fragment() {
         fab_add_task.setOnClickListener {
             val intent = Intent(activity, EditMainActivity::class.java)
             intent.putExtra("is_new", true)
+            intent.putExtra("is_privacy", false)
             startActivity(intent)
         }
 
@@ -132,40 +134,43 @@ class EditFragment : Fragment() {
         viewModel.privatePasswordVerified.observe(viewLifecycleOwner) {
             if (it == 1) {
                 val intent = Intent(activity, PrivacyActivity::class.java)
-                Toast.makeText(context, "enter the private mode", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.toast_privacy_mode), Toast.LENGTH_SHORT).show()
                 startActivity(intent)
             } else if (it == 2) {
-                Toast.makeText(context, "password wrong", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.toast_password_wrong), Toast.LENGTH_SHORT).show()
             }
         }
 
         // setup is have private password logic
         viewModel.isHavePrivatePassword.observe(viewLifecycleOwner) { isHavePrivatePassword ->
-        val view = LayoutInflater.from(activity).inflate(R.layout.dialog_private_valid, null)
+            var alertDialog: AlertDialog? = null
+            val view = LayoutInflater.from(activity).inflate(R.layout.dialog_private_valid, null)
+            view.btn_confirm.setOnClickListener {
+                val password = view.findViewById<TextInputEditText>(R.id.dialog_password).text ?: ""
+                lifecycleScope.launch(Dispatchers.IO) {
+                    if (userLocalId != -1L) {
+                        val verifyPrivatePassword =
+                            viewModel.verifyPrivatePassword(userLocalId, password.toString())
+                        if (verifyPrivatePassword) {
+                            viewModel.privatePasswordVerified.postValue(1)
+                        } else {
+                            viewModel.privatePasswordVerified.postValue(2)
+                        }
+                    } else {
+                        Log.e(TAG, "onActivityCreated: no user local id find")
+                    }
+                }
+                alertDialog?.dismiss()
+            }
+            view.btn_cancel.setOnClickListener {
+                alertDialog?.dismiss()
+            }
             when (isHavePrivatePassword) {
                 // if the user have the private password
                 1 -> {
                     // alert a dialog and let user enter
-                    AlertDialog.Builder(requireActivity())
-                        .setTitle("enter the password to private mode")
+                    alertDialog = AlertDialog.Builder(requireActivity())
                         .setView(view)
-                        .setPositiveButton("confirm") { _, _ ->
-                            val password = view.findViewById<TextInputEditText>(R.id.dialog_password).text ?: ""
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                if (userLocalId != -1L) {
-                                    val verifyPrivatePassword =
-                                        viewModel.verifyPrivatePassword(userLocalId, password.toString())
-                                    if (verifyPrivatePassword) {
-                                        viewModel.privatePasswordVerified.postValue(1)
-                                    } else {
-                                        viewModel.privatePasswordVerified.postValue(2)
-                                    }
-                                } else {
-                                    Log.e(TAG, "onActivityCreated: no user local id find")
-                                }
-                            }
-                        }
-                        .setNegativeButton("cancel") { _, _ -> }
                         .show()
                 }
                 // if the user do not have the private password

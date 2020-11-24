@@ -3,7 +3,6 @@ package xyz.aiinirii.imarkdownx.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import xyz.aiinirii.imarkdownx.R
@@ -22,7 +21,7 @@ class FileItemAdapter(private var fileItemList: List<File>?) : RecyclerView.Adap
         fun onItemClick(view: View, position: Int)
     }
 
-    interface OnItemLongClickListener{
+    interface OnItemLongClickListener {
         fun onItemLongClick(view: View, position: Int)
     }
 
@@ -46,7 +45,7 @@ class FileItemAdapter(private var fileItemList: List<File>?) : RecyclerView.Adap
                 onItemClickListener!!.onItemClick(it, position)
             }
         }
-        if (onItemLongClickListener!=null){
+        if (onItemLongClickListener != null) {
             holder.itemView.setOnLongClickListener {
                 onItemLongClickListener!!.onItemLongClick(it, position)
                 true

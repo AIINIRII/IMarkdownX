@@ -9,7 +9,7 @@ import android.widget.EditText
  *
  * @author AIINIRII
  */
-class EditTextOperationImpl constructor() :EditTextOperation{
+class EditTextOperationImpl constructor() : EditTextOperation {
     private var src: String? = null
     private var srcStart = 0
     private var srcEnd = 0
@@ -20,11 +20,11 @@ class EditTextOperationImpl constructor() :EditTextOperation{
 
     lateinit var editText: EditText
 
-    constructor(editText: EditText):this(){
+    constructor(editText: EditText) : this() {
         this.editText = editText
     }
 
-    constructor(`in`: Parcel):this() {
+    constructor(`in`: Parcel) : this() {
         this.src = `in`.readString()
         this.srcStart = `in`.readInt()
         this.srcEnd = `in`.readInt()
@@ -39,7 +39,7 @@ class EditTextOperationImpl constructor() :EditTextOperation{
         this.srcEnd = srcEnd
     }
 
-    fun setDst(dst: CharSequence?, dstStart: Int, dstEnd: Int){
+    fun setDst(dst: CharSequence?, dstStart: Int, dstEnd: Int) {
         this.dst = dst?.toString() ?: ""
         this.dstStart = dstStart
         this.dstEnd = dstEnd
@@ -80,6 +80,7 @@ class EditTextOperationImpl constructor() :EditTextOperation{
             editText.setSelection(idx)
         }
     }
+
     override fun describeContents(): Int {
         return 0
     }
@@ -94,7 +95,8 @@ class EditTextOperationImpl constructor() :EditTextOperation{
     }
 
 
-    @JvmField val CREATOR: Creator<EditTextOperationImpl?> = object : Creator<EditTextOperationImpl?> {
+    @JvmField
+    val CREATOR: Creator<EditTextOperationImpl?> = object : Creator<EditTextOperationImpl?> {
         override fun createFromParcel(source: Parcel): EditTextOperationImpl? {
             return EditTextOperationImpl(source)
         }

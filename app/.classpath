@@ -137,12 +137,19 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: androidx.versionedparcelable:versionedparcelable:1.1.0@aar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: androidx.viewpager2:viewpager2:1.0.0@aar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: androidx.viewpager:viewpager:1.0.0@aar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: com.atlassian.commonmark:commonmark-ext-gfm-strikethrough:0.13.0@jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: com.atlassian.commonmark:commonmark-ext-gfm-tables:0.13.0@jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: com.atlassian.commonmark:commonmark:0.13.0@jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: com.google.android.material:material:1.2.1@aar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: com.google.code.findbugs:jsr305:2.0.1@jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: com.squareup:javawriter:2.1.1@jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: io.noties.markwon:core:4.6.0@aar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: io.noties.markwon:editor:4.6.0@aar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: io.noties.markwon:ext-strikethrough:4.6.0@aar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: io.noties.markwon:ext-tables:4.6.0@aar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: io.noties.markwon:ext-tasklist:4.6.0@aar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: io.noties.markwon:html:4.6.0@aar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: io.noties.markwon:image:4.6.0@aar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: javax.inject:javax.inject:1@jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: junit:junit:4.12@jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: junit:junit:4.13@jar"/>

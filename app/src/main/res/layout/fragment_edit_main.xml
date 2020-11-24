@@ -1,97 +1,237 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
 
         <variable
-                name="viewModel"
-                type="xyz.aiinirii.imarkdownx.ui.edit.main.EditMainViewModel"/>
+            name="viewModel"
+            type="xyz.aiinirii.imarkdownx.ui.edit.main.EditMainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/edit_main"
-            tools:context=".ui.edit.main.EditMainFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        android:id="@+id/edit_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.edit.main.EditMainFragment">
 
 
         <com.google.android.material.appbar.AppBarLayout
-                android:layout_width="match_parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/appBarLayout">
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar_edit"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent"
-                    android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
-                    app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
-                    app:navigationIcon="@drawable/ic_back"/>
+                android:id="@+id/toolbar_edit"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
+                app:menu="@menu/edit_main_menu"
+                app:navigationIcon="@drawable/ic_back"
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
         <xyz.aiinirii.imarkdownx.widget.StateEditText
-                android:id="@+id/edittext_title_edit_main"
-                android:background="@color/colorWhiteLittleDark"
-                android:inputType="text"
-                android:paddingTop="@dimen/spacing_large"
-                android:paddingBottom="@dimen/spacing_small"
-                android:textSize="@dimen/font_larger"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_title"
-                android:paddingHorizontal="@dimen/spacing_normal"
-                android:text="@={viewModel.fileName}"
-                app:layout_constraintTop_toBottomOf="@id/appBarLayout"
-                tools:text="title"/>
+            android:id="@+id/edittext_title_edit_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorWhiteLittleDark"
+            android:hint="@string/hint_title"
+            android:inputType="text"
+            android:paddingHorizontal="@dimen/spacing_normal"
+            android:paddingTop="@dimen/spacing_large"
+            android:paddingBottom="@dimen/spacing_small"
+            android:text="@={viewModel.fileName}"
+            android:textSize="@dimen/font_larger"
+            app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+            tools:text="title" />
 
-        <xyz.aiinirii.imarkdownx.widget.StateEditText
+        <ScrollView
+            android:id="@+id/edittext_edit_main_scrollview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toTopOf="@+id/toolbar_bottom2"
+            app:layout_constraintTop_toBottomOf="@id/edittext_title_edit_main">
+
+            <xyz.aiinirii.imarkdownx.widget.StateEditText
                 android:id="@+id/edittext_edit_main"
-                android:background="@color/colorWhite"
-                android:textSize="@dimen/font_large"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:hint="@string/hint_content"
-                android:text="@={viewModel.fileContent}"
-                android:inputType="textMultiLine"
+                android:background="@color/colorWhite"
                 android:gravity="start|top"
+                android:hint="@string/hint_content"
+                android:inputType="textMultiLine"
                 android:padding="@dimen/spacing_normal"
-                app:layout_constraintTop_toBottomOf="@id/edittext_title_edit_main"
-                app:layout_constraintBottom_toTopOf="@id/btn_undo"
-                tools:text="content"
+                android:text="@={viewModel.fileContent}"
+                android:textSize="@dimen/font_large"
+                app:layout_constraintVertical_bias="1.0"
                 tools:layout_editor_absoluteX="-118dp"
-                app:layout_constraintVertical_bias="1.0"/>
+                tools:text="content" />
+        </ScrollView>
 
-        <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_render"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="@{() -> viewModel.renderFile()}"
-                android:text="@string/btn_render"
-                android:layout_marginVertical="@dimen/spacing_normal"
-                app:rippleColor="@color/colorDark"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintHorizontal_bias="0.179"
-                app:layout_constraintEnd_toStartOf="@id/btn_undo"/>
+        <LinearLayout
+            android:id="@+id/toolbar_bottom2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/toolbar_bottom1">
 
-        <com.google.android.material.button.MaterialButton
+            <ImageButton
                 android:id="@+id/btn_undo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/btn_undo"
-                android:layout_marginVertical="@dimen/spacing_normal"
-                app:rippleColor="@color/colorDark"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHorizontal_bias="0.808"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/btn_render"/>
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_undo"
+                android:src="@drawable/ic_undo" />
+
+            <ImageButton
+                android:id="@+id/btn_redo"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_redo"
+                android:src="@drawable/ic_redo" />
+
+            <ImageButton
+                android:id="@+id/btn_hr"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_hr"
+                android:onClick="@{() -> viewModel.hr()}"
+                android:src="@drawable/ic_hr" />
+
+            <ImageButton
+                android:id="@+id/btn_heading"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_underline"
+                android:onClick="@{() ->viewModel.heading()}"
+                android:src="@drawable/ic_heading" />
+
+            <ImageButton
+                android:id="@+id/btn_quote"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_underline"
+                android:onClick="@{() ->viewModel.quote()}"
+                android:src="@drawable/ic_quote" />
+
+            <ImageButton
+                android:id="@+id/btn_bold"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_bold"
+                android:onClick="@{() ->viewModel.bold()}"
+                android:src="@drawable/ic_bold" />
+
+            <ImageButton
+                android:id="@+id/btn_italic"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_italic"
+                android:onClick="@{() ->viewModel.italic()}"
+                android:src="@drawable/ic_italic" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/toolbar_bottom1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageButton
+                android:id="@+id/btn_file"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_file"
+                android:onClick="@{() ->viewModel.image()}"
+                android:src="@drawable/ic_file" />
+
+            <ImageButton
+                android:id="@+id/btn_code"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_code"
+                android:onClick="@{() ->viewModel.code()}"
+                android:src="@drawable/ic_code" />
+
+            <ImageButton
+                android:id="@+id/btn_delete"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_code"
+                android:onClick="@{() ->viewModel.delete()}"
+                android:src="@drawable/ic_delete" />
+
+            <ImageButton
+                android:id="@+id/btn_link"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_link"
+                android:onClick="@{() ->viewModel.link()}"
+                android:src="@drawable/ic_link" />
+
+            <ImageButton
+                android:id="@+id/btn_link_alt"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_link_alt"
+                android:onClick="@{() ->viewModel.linkAlt()}"
+                android:src="@drawable/ic_link_alt" />
+
+            <ImageButton
+                android:id="@+id/btn_list"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_list"
+                android:onClick="@{() ->viewModel.list()}"
+                android:src="@drawable/ic_list" />
+
+            <ImageButton
+                android:id="@+id/btn_table"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height_normal"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary_lighter"
+                android:contentDescription="@string/btn_table"
+                android:onClick="@{() ->viewModel.table()}"
+                android:src="@drawable/ic_table" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

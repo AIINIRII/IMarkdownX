@@ -11,8 +11,6 @@ import xyz.aiinirii.imarkdownx.entity.File
 
 /**
  * view model for edit page
- * @property dataSource FileCatalogDataSource
- * @property fileCatalog LiveData<List<FileItem>>
  * @constructor
  */
 class EditViewModel : ViewModel() {
@@ -28,8 +26,9 @@ class EditViewModel : ViewModel() {
         get() = _isHavePrivatePassword
 
     init {
-        val fileDao = AppDatabase.getDatabase(IMarkdownXApplication.context).fileDao()
-        val userDao = AppDatabase.getDatabase(IMarkdownXApplication.context).userDao()
+        val database = AppDatabase.getDatabase(IMarkdownXApplication.context)
+        val fileDao = database.fileDao()
+        val userDao = database.userDao()
         fileRepository = FileRepository(fileDao)
         userRepository = UserRepository(userDao)
         files = fileRepository.unlockedFile

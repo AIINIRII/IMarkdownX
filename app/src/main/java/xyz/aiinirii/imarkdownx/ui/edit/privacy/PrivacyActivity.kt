@@ -1,7 +1,7 @@
 package xyz.aiinirii.imarkdownx.ui.edit.privacy
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import xyz.aiinirii.imarkdownx.R
 
 class PrivacyActivity : AppCompatActivity() {

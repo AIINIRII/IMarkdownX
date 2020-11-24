@@ -8,7 +8,7 @@ import java.io.Serializable
  *
  * @author AIINIRII
  */
-interface EditTextOperation :Serializable,Parcelable{
+interface EditTextOperation : Serializable, Parcelable {
 
     /**
      * undo the text edit operation

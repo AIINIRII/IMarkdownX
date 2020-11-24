@@ -2,8 +2,6 @@ package xyz.aiinirii.imarkdownx.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.sql.Date
-import java.util.*
 
 /**
  * File Item
@@ -14,4 +12,8 @@ class File(var name: String, var date: String, var content: String, var locked: 
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
+
+    override fun toString(): String {
+        return "File(name='$name', date='$date', content='$content', locked=$locked, id=$id)"
+    }
 }

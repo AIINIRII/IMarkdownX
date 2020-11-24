@@ -65,7 +65,7 @@ class PrivacyFragment : Fragment() {
         fileItemAdapter.onItemLongClickListener = object : FileItemAdapter.OnItemLongClickListener {
             override fun onItemLongClick(view: View, position: Int) {
                 val popupMenu = PopupMenu(requireContext(), view)
-                popupMenu.menuInflater.inflate(R.menu.item_long_click_menu, popupMenu.menu)
+                popupMenu.menuInflater.inflate(R.menu.item_long_click_private_menu, popupMenu.menu)
 
                 popupMenu.setOnMenuItemClickListener {
                     when (it.itemId) {
@@ -97,6 +97,7 @@ class PrivacyFragment : Fragment() {
         fab_add_task.setOnClickListener {
             val intent = Intent(activity, EditMainActivity::class.java)
             intent.putExtra("is_new", true)
+            intent.putExtra("is_privacy", true)
             startActivity(intent)
         }
 

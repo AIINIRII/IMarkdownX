@@ -32,7 +32,7 @@ class PrivacyViewModel : ViewModel() {
         }
     }
 
-    fun deleteItem(position:Int) {
+    fun deleteItem(position: Int) {
         viewModelScope.launch {
             val deleteFile = files.value?.get(position)
             if (deleteFile != null) {
@@ -47,6 +47,7 @@ class PrivacyViewModel : ViewModel() {
             repository.refresh()
         }
     }
+
     /**
      * Factory for [PrivacyViewModel]
      */

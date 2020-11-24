@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import xyz.aiinirii.imarkdownx.R
-import xyz.aiinirii.imarkdownx.ui.edit.main.EditMainViewModel
 
 class EditRenderActivity : AppCompatActivity() {
 

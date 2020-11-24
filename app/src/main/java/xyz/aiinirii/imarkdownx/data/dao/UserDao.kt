@@ -1,6 +1,5 @@
 package xyz.aiinirii.imarkdownx.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import xyz.aiinirii.imarkdownx.entity.User
 
