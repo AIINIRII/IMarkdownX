@@ -32,4 +32,9 @@ interface FileDao {
     @Query("select * from File where locked")
     fun loadAllLockedFiles(): LiveData<List<File>>
 
+    @Query("select File.id, File.name, date, content, locked, Folder.id as folderId from File left join Folder on File.folderId = Folder.id where Folder.id=:id and not locked")
+    fun loadAllUnLockedFilesByFolderId(id: Long): LiveData<List<File>>
+
+    @Query("select File.id, File.name, date, content, locked, Folder.id as folderId from File left join Folder on File.folderId = Folder.id where Folder.id=:id and locked")
+    fun loadAllLockedFilesByFolderId(id: Long): LiveData<List<File>>
 }

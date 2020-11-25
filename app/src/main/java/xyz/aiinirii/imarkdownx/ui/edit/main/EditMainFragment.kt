@@ -56,8 +56,10 @@ class EditMainFragment : Fragment() {
         val extras: Bundle = activity?.intent?.extras!!
         val isNew = extras.getBoolean("is_new")
         val isPrivacy = extras.getBoolean("is_privacy")
+        val folderId = extras.getLong("folder_id")
 
         val viewModel = fragmentEditMainBinding.viewModel!!
+        viewModel.folderId = folderId
         if (!isNew) {
             // if it is not new file, load it.
             val fileId = extras.getLong("file_id")
@@ -65,6 +67,7 @@ class EditMainFragment : Fragment() {
             val file = viewModel.getFileById(fileId)
             if (file != null) {
                 file.observe(viewLifecycleOwner) {
+                    Log.d(TAG, "onActivityCreated: file: $it")
                     Log.d(TAG, "onViewCreated: file content: ${it.content}")
                     viewModel.fileContent.postValue(it.content)
                     viewModel.fileName.postValue(it.name)

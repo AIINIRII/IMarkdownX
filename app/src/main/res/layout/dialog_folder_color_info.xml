@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="viewModel"
-            type="xyz.aiinirii.imarkdownx.ui.edit.main.EditMainViewModel" />
-    </data>
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="@dimen/width_normal"
-        android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/width_normal"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/title"
@@ -22,11 +12,11 @@
             android:background="@color/colorLight"
             android:paddingHorizontal="@dimen/spacing_large"
             android:paddingVertical="@dimen/spacing_small"
-            android:text="@string/title_enter_table_info"
+            android:text="@string/title_change_the_color"
             android:textSize="@dimen/font_large" />
 
         <LinearLayout
-            android:id="@+id/dialog_table"
+            android:id="@+id/dialog_folder_color"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/title"
@@ -35,43 +25,56 @@
             android:layout_marginBottom="@dimen/spacing_normal">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/dialog_table_row"
+                android:id="@+id/dialog_color_red"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/spacing_small"
                 android:layout_weight="1"
                 android:background="@drawable/edittext_background"
                 android:gravity="center_vertical"
-                android:hint="@string/dialog_row_number"
+                android:hint="@string/dialog_input_red"
                 android:inputType="number"
-                android:maxLength="1"
+                android:maxLength="3"
                 android:paddingHorizontal="@dimen/spacing_normal"
                 android:paddingVertical="@dimen/spacing_small"
-                android:text="@={viewModel.tableRow}"
-                android:textSize="@dimen/font_large" />
+                android:textSize="@dimen/font_normal" />
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/dialog_table_col"
+                android:id="@+id/dialog_color_green"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/spacing_small"
                 android:layout_weight="1"
                 android:background="@drawable/edittext_background"
                 android:gravity="center_vertical"
-                android:hint="@string/dialog_col_number"
+                android:hint="@string/dialog_input_green"
                 android:inputType="number"
-                android:maxLength="1"
+                android:maxLength="3"
                 android:paddingHorizontal="@dimen/spacing_normal"
                 android:paddingVertical="@dimen/spacing_small"
-                android:text="@={viewModel.tableCol}"
-                android:textSize="@dimen/font_large" />
+                android:textSize="@dimen/font_normal" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/dialog_color_blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_small"
+                android:layout_weight="1"
+                android:background="@drawable/edittext_background"
+                android:gravity="center_vertical"
+                android:hint="@string/dialog_input_blue"
+                android:inputType="number"
+                android:maxLength="3"
+                android:paddingHorizontal="@dimen/spacing_normal"
+                android:paddingVertical="@dimen/spacing_small"
+                android:textSize="@dimen/font_normal" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/btns_table_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/dialog_table"
+            android:layout_below="@id/dialog_folder_color"
             android:layout_marginHorizontal="@dimen/spacing_normal">
 
 
@@ -82,7 +85,6 @@
                 android:layout_marginHorizontal="@dimen/spacing_normal"
                 android:layout_marginVertical="@dimen/spacing_normal"
                 android:layout_weight="1"
-                android:onClick="@{()->viewModel.confirmTableCreate()}"
                 android:text="@string/btn_confirm"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -96,7 +98,6 @@
                 android:layout_marginHorizontal="@dimen/spacing_normal"
                 android:layout_marginVertical="@dimen/spacing_normal"
                 android:layout_weight="1"
-                android:onClick="@{()->viewModel.cancelTableCreate()}"
                 android:text="@string/btn_cancel"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -105,4 +106,3 @@
 
         </LinearLayout>
     </RelativeLayout>
-</layout>

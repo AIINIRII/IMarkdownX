@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -8,14 +10,12 @@
         <variable
             name="viewModel"
             type="xyz.aiinirii.imarkdownx.ui.edit.EditViewModel" />
+
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.edit.EditFragment">
+        android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -25,49 +25,101 @@
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar_edit"
+                app:title="@{viewModel.toolbarTitle}"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
                 android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
                 app:menu="@menu/edit_menu"
+                app:navigationIcon="@drawable/ic_menu"
                 app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
                 app:titleTextColor="@color/colorWhite" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_refresh_edit"
+
+        <androidx.drawerlayout.widget.DrawerLayout
+            android:id="@+id/drawer_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
-
-            <ScrollView
-                android:id="@+id/scrollView_edit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="16dp">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/listview_files"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            </ScrollView>
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_add_task"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/spacing_large"
-            android:backgroundTint="@color/colorAccent"
-            android:src="@drawable/ic_add_item"
-            android:tint="@color/colorLight"
-            app:fabSize="normal"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/swipe_refresh_edit"
-            app:rippleColor="@color/colorDark"
-            app:tint="@color/colorLight" />
+            app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".ui.edit.EditFragment">
+
+                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                    android:id="@+id/swipe_refresh_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ScrollView
+                        android:id="@+id/scrollView_edit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:layout_editor_absoluteX="16dp">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/listview_files"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </ScrollView>
+                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fab_add_task"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/spacing_large"
+                    android:backgroundTint="@color/colorAccent"
+                    android:src="@drawable/ic_add_item"
+                    android:tint="@color/colorLight"
+                    app:fabSize="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/swipe_refresh_edit"
+                    app:rippleColor="@color/colorDark"
+                    app:tint="@color/colorLight" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_gravity="start"
+                android:background="@color/colorWhite"
+                android:layout_height="match_parent">
+
+                <ScrollView
+                    android:id="@+id/listview_folders_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorWhite">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/listview_folders"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@null" />
+
+                </ScrollView>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fab_add_folder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/spacing_large"
+                    android:backgroundTint="@color/colorAccent"
+                    android:src="@drawable/ic_add_item"
+                    android:tint="@color/colorLight"
+                    app:fabSize="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/listview_folders_content"
+                    app:rippleColor="@color/colorDark"
+                    app:tint="@color/colorLight" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.drawerlayout.widget.DrawerLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

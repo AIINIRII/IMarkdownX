@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import xyz.aiinirii.imarkdownx.data.dao.FileDao
 import xyz.aiinirii.imarkdownx.entity.File
+import xyz.aiinirii.imarkdownx.entity.Folder
 
 /**
  *
@@ -48,6 +49,13 @@ class FileRepository(private val fileDao: FileDao) {
         Log.d(TAG, "unLock: unlock the file")
         file.locked = false
         fileDao.updateFile(file)
+    }
+
+    fun findUnlockedFilesByFolder(folder: Folder): LiveData<List<File>> {
+        return fileDao.loadAllUnLockedFilesByFolderId(folder.id)
+    }
+    fun findLockedFilesByFolder(folder: Folder): LiveData<List<File>> {
+        return fileDao.loadAllLockedFilesByFolderId(folder.id)
     }
 
 }

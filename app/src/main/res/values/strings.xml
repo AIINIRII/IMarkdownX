@@ -63,4 +63,14 @@
     <string name="toast_privacy_mode">privacy mode</string>
     <string name="toast_password_wrong">password wrong</string>
     <string name="btn_hr">hr</string>
+    <string name="default_folder_name">default</string>
+    <string name="title_create_a_folder">Create a folder:</string>
+    <string name="hint_folder_name">folder name:</string>
+    <string name="item_change_folder_name">change folder name</string>
+    <string name="item_change_folder_color">change folder color</string>
+    <string name="title_change_the_color">Change the color: (0~255)</string>
+    <string name="dialog_input_red">R</string>
+    <string name="dialog_input_green">G</string>
+    <string name="dialog_input_blue">B</string>
+    <string name="title_folder_change_name">Change name to:</string>
 </resources>

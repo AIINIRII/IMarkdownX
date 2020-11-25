@@ -6,4 +6,5 @@
             android:title="@string/item_private_mode"
             android:icon="@drawable/ic_private_mode"
             app:showAsAction="ifRoom"/>
+
 </menu>

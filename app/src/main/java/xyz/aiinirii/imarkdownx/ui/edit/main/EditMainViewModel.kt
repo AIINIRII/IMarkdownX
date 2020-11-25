@@ -8,6 +8,7 @@ import xyz.aiinirii.imarkdownx.IMarkdownXApplication
 import xyz.aiinirii.imarkdownx.data.FileRepository
 import xyz.aiinirii.imarkdownx.db.AppDatabase
 import xyz.aiinirii.imarkdownx.entity.File
+import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -18,6 +19,7 @@ class EditMainViewModel : ViewModel() {
     private val repository: FileRepository
     lateinit var file: LiveData<File>
         private set
+    var folderId: Long = -1L
     val fileContent = MutableLiveData<String>()
     val fileName = MutableLiveData<String>()
     val locked = MutableLiveData<Boolean>()
@@ -159,6 +161,9 @@ class EditMainViewModel : ViewModel() {
                 Log.d(TAG, "saveFile: successfully save the file")
             }
         } else {
+            if (folderId == -1L) {
+                throw IllegalStateException("the folder id haven't been set")
+            }
             val currentFile =
                 File(
                     fileName.value ?: "",
@@ -166,6 +171,7 @@ class EditMainViewModel : ViewModel() {
                     fileContent.value ?: "",
                     locked.value ?: false
                 )
+            currentFile.folderId = this@EditMainViewModel.folderId
             Log.d(TAG, "saveFile: begin to create file: $currentFile")
             Log.d(TAG, "saveFile: set content: ${currentFile.content}, set date: ${currentFile.date}")
             viewModelScope.launch(Dispatchers.IO) {

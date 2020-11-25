@@ -1,34 +1,66 @@
 package xyz.aiinirii.imarkdownx.ui.edit.privacy
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.IMarkdownXApplication
+import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.data.FileRepository
+import xyz.aiinirii.imarkdownx.data.FolderRepository
 import xyz.aiinirii.imarkdownx.db.AppDatabase
 import xyz.aiinirii.imarkdownx.entity.File
+import xyz.aiinirii.imarkdownx.entity.Folder
 
 class PrivacyViewModel : ViewModel() {
 
-    private val repository: FileRepository
+    private val fileRepository: FileRepository
+    private val folderRepository: FolderRepository
+
+
+    private val _filesInFolderInitialized = MutableLiveData<Boolean>()
+    val filesInFolderInitialized: LiveData<Boolean>
+        get() = _filesInFolderInitialized
 
     val files: LiveData<List<File>>
+    var folder = MutableLiveData<LiveData<Folder?>>()
+    val folders: LiveData<List<Folder>>
+    lateinit var filesInFolder: LiveData<List<File>>
 
     init {
-        val fileDao = AppDatabase.getDatabase(IMarkdownXApplication.context).fileDao()
-        repository = FileRepository(fileDao)
-        files = repository.lockedFile
+        val database = AppDatabase.getDatabase(IMarkdownXApplication.context)
+        val fileDao = database.fileDao()
+        val folderDao = database.folderDao()
+        fileRepository = FileRepository(fileDao)
+        folderRepository = FolderRepository(folderDao)
+        folders = folderRepository.findAllFolders()
+        files = fileRepository.lockedFile
+        folder.postValue(folderRepository.findFirstFolder())
+    }
+
+    suspend fun findFilesByFolder(): LiveData<List<File>> {
+        val currentFolder: Folder
+        if (folder.value!!.value == null) {
+            val newFolder =
+                Folder(
+                    IMarkdownXApplication.context.getString(R.string.default_folder_name), IMarkdownXApplication.context.getColor(
+                        R.color.colorPrimaryDark))
+            val id = folderRepository.insert(newFolder)
+            newFolder.id = id
+            currentFolder = newFolder
+        } else {
+            currentFolder = folder.value!!.value!!
+        }
+        filesInFolder = fileRepository.findLockedFilesByFolder(currentFolder)
+        _filesInFolderInitialized.postValue(true)
+        return filesInFolder
     }
 
     fun unlockItem(position: Int) {
         viewModelScope.launch {
             val lockedFile = files.value?.get(position)
             if (lockedFile != null) {
-                repository.unlock(lockedFile)
+                fileRepository.unlock(lockedFile)
             }
-            repository.refresh()
+            fileRepository.refresh()
         }
     }
 
@@ -36,15 +68,15 @@ class PrivacyViewModel : ViewModel() {
         viewModelScope.launch {
             val deleteFile = files.value?.get(position)
             if (deleteFile != null) {
-                repository.delete(deleteFile)
+                fileRepository.delete(deleteFile)
             }
-            repository.refresh()
+            fileRepository.refresh()
         }
     }
 
     fun refresh() {
         viewModelScope.launch {
-            repository.refresh()
+            fileRepository.refresh()
         }
     }
 

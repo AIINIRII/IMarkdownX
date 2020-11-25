@@ -6,11 +6,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -18,13 +21,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textview.MaterialTextView
 import kotlinx.android.synthetic.main.dialog_private_valid.view.*
 import kotlinx.android.synthetic.main.fragment_edit.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.adapter.FileItemAdapter
+import xyz.aiinirii.imarkdownx.adapter.FolderItemAdapter
 import xyz.aiinirii.imarkdownx.databinding.FragmentEditBinding
 import xyz.aiinirii.imarkdownx.ui.changeprivatepassword.ChangePrivatePasswordActivity
 import xyz.aiinirii.imarkdownx.ui.edit.main.EditMainActivity
@@ -74,42 +80,59 @@ class EditFragment : Fragment() {
         // load user local id
         val userLocalId = sharedPreferences.getLong("userLocalId", -1L)
 
+
+        // add folder
+        fab_add_folder.setOnClickListener {
+            val folderAddAlertDialog: AlertDialog
+            val view = LayoutInflater.from(context).inflate(R.layout.dialog_folder_info, null)
+            folderAddAlertDialog = AlertDialog.Builder(context)
+                .setView(view)
+                .show()
+            view.findViewById<MaterialButton>(R.id.btn_confirm).setOnClickListener {
+                viewModel.createFolder(view.findViewById<TextInputEditText>(R.id.dialog_folder_name).text.toString())
+                folderAddAlertDialog.dismiss()
+            }
+            view.findViewById<MaterialButton>(R.id.btn_cancel).setOnClickListener {
+                folderAddAlertDialog.dismiss()
+            }
+        }
+
+        // init folder item adapter
+        viewModel.folders.observe(viewLifecycleOwner) {
+            val folderItemAdapter = FolderItemAdapter(null)
+            initFolderItemClickAction(folderItemAdapter, viewModel)
+            listview_folders.adapter = folderItemAdapter
+            it.observe(viewLifecycleOwner) { folderList ->
+                folderItemAdapter.setFolderItemList(folderList)
+            }
+        }
+
+        // set recycler list view
+        val linearLayoutManagerFolderItemAdapter = LinearLayoutManager(this.context)
+        listview_folders.layoutManager = linearLayoutManagerFolderItemAdapter
+
         // init file item adapter
-        val fileItemAdapter = FileItemAdapter(viewModel.files.value)
-        viewModel.files.observe(this.viewLifecycleOwner) {
-            fileItemAdapter.setFileItemList(it)
-        }
+        val fileItemAdapter = FileItemAdapter(null)
 
-        // set action when click file item
-        fileItemAdapter.onItemClickListener = object : FileItemAdapter.OnItemClickListener {
-            override fun onItemClick(view: View, position: Int) {
-                val intent = Intent(activity, EditMainActivity::class.java)
-                intent.putExtra("is_new", false)
-                intent.putExtra("file_id", viewModel.files.value?.get(position)?.id)
-                startActivity(intent)
-            }
-        }
 
-        // set action when long click file item
-        fileItemAdapter.onItemLongClickListener = object : FileItemAdapter.OnItemLongClickListener {
-            override fun onItemLongClick(view: View, position: Int) {
-                val popupMenu = PopupMenu(requireContext(), view)
-                popupMenu.menuInflater.inflate(R.menu.item_long_click_menu, popupMenu.menu)
-
-                popupMenu.setOnMenuItemClickListener {
-                    when (it.itemId) {
-                        R.id.delete_item -> {
-                            viewModel.deleteItem(position)
-                        }
-                        R.id.lock_item -> {
-                            viewModel.lockItem(position)
-                        }
-                    }
-                    true
+        viewModel.folder.observe(viewLifecycleOwner) { folderLiveData ->
+            folderLiveData.observe(viewLifecycleOwner) {
+                viewModel.toolbarTitle.postValue(it?.name)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    viewModel.findFilesByFolder()
                 }
-                popupMenu.show()
             }
         }
+
+        viewModel.filesInFolderInitialized.observe(viewLifecycleOwner) { filesInFolderIsInitialized ->
+            if (filesInFolderIsInitialized) {
+                viewModel.filesInFolder.observe(viewLifecycleOwner) {
+                    fileItemAdapter.setFileItemList(it)
+                }
+            }
+        }
+
+        initFileItemClickAction(fileItemAdapter, viewModel)
 
         // set refresh action
         swipe_refresh_edit.setOnRefreshListener {
@@ -125,6 +148,7 @@ class EditFragment : Fragment() {
         // set action when click fab_add_task
         fab_add_task.setOnClickListener {
             val intent = Intent(activity, EditMainActivity::class.java)
+            intent.putExtra("folder_id", viewModel.folder.value!!.value!!.id)
             intent.putExtra("is_new", true)
             intent.putExtra("is_privacy", false)
             startActivity(intent)
@@ -136,8 +160,10 @@ class EditFragment : Fragment() {
                 val intent = Intent(activity, PrivacyActivity::class.java)
                 Toast.makeText(context, getString(R.string.toast_privacy_mode), Toast.LENGTH_SHORT).show()
                 startActivity(intent)
+                viewModel.initIsHavePrivatePassword()
             } else if (it == 2) {
                 Toast.makeText(context, getString(R.string.toast_password_wrong), Toast.LENGTH_SHORT).show()
+                viewModel.initIsHavePrivatePassword()
             }
         }
 
@@ -180,7 +206,6 @@ class EditFragment : Fragment() {
                     startActivity(intent)
                 }
                 else -> {
-                    Log.e(TAG, "onActivityCreated: no such value for is have private password")
                 }
             }
         }
@@ -193,6 +218,139 @@ class EditFragment : Fragment() {
                 }
             }
             true
+        }
+
+        val drawerToggle =
+            ActionBarDrawerToggle(activity, drawer_layout, toolbar_edit, R.string.app_name, R.string.app_name)
+
+        drawerToggle.syncState()
+
+        drawer_layout.addDrawerListener(drawerToggle)
+
+        toolbar_edit.setNavigationOnClickListener {
+            if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+                hideDrawer()
+            } else {
+                openDrawer()
+            }
+        }
+    }
+
+    private fun hideDrawer() {
+        drawer_layout.closeDrawer(GravityCompat.START)
+        fab_add_folder.hide()
+        fab_add_task.show()
+    }
+
+    private fun openDrawer() {
+        drawer_layout.openDrawer(GravityCompat.START)
+        fab_add_task.hide()
+        fab_add_folder.show()
+    }
+
+    private fun initFileItemClickAction(
+        fileItemAdapter: FileItemAdapter,
+        viewModel: EditViewModel
+    ) {
+        // set action when click file item
+        fileItemAdapter.onItemClickListener = object : FileItemAdapter.OnItemClickListener {
+            override fun onItemClick(view: View, position: Int) {
+                val intent = Intent(activity, EditMainActivity::class.java)
+                intent.putExtra("is_new", false)
+                intent.putExtra("file_id", viewModel.filesInFolder.value?.get(position)?.id)
+                startActivity(intent)
+            }
+        }
+
+        // set action when long click file item
+        fileItemAdapter.onItemLongClickListener = object : FileItemAdapter.OnItemLongClickListener {
+            override fun onItemLongClick(view: View, position: Int) {
+                val popupMenu = PopupMenu(requireContext(), view)
+                popupMenu.menuInflater.inflate(R.menu.file_item_long_click_menu, popupMenu.menu)
+
+                popupMenu.setOnMenuItemClickListener {
+                    when (it.itemId) {
+                        R.id.delete_item -> {
+                            viewModel.deleteItem(position)
+                        }
+                        R.id.lock_item -> {
+                            viewModel.lockItem(position)
+                        }
+                    }
+                    true
+                }
+                popupMenu.show()
+            }
+        }
+    }
+
+    private fun initFolderItemClickAction(
+        folderItemAdapter: FolderItemAdapter,
+        viewModel: EditViewModel
+    ) {
+        // set click action
+        folderItemAdapter.onItemClickListener = object : FolderItemAdapter.OnItemClickListener {
+            override fun onItemClick(view: View, position: Int) {
+                val folder = viewModel.folders.value!!.value?.get(position)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    viewModel.updateFilesInFolderByFolder(folder)
+                }
+                hideDrawer()
+            }
+        }
+
+        // set long click action
+        folderItemAdapter.onItemLongClickListener = object : FolderItemAdapter.OnItemLongClickListener {
+            override fun onItemLongClick(view: View, position: Int) {
+                val popupMenu = PopupMenu(requireContext(), view)
+                popupMenu.menuInflater.inflate(R.menu.folder_item_long_click_menu, popupMenu.menu)
+                popupMenu.setOnMenuItemClickListener {
+                    when (it.itemId) {
+                        R.id.delete_item -> {
+                            viewModel.deleteFolderItem(position)
+                        }
+                        R.id.change_color -> {
+                            val folderColorInfoView =
+                                LayoutInflater.from(context).inflate(R.layout.dialog_folder_color_info, null)
+                            val folderColorAlertDialog = AlertDialog.Builder(context)
+                                .setView(folderColorInfoView)
+                                .show()
+                            folderColorInfoView.apply {
+                                findViewById<MaterialButton>(R.id.btn_confirm).setOnClickListener {
+                                    val red = findViewById<TextInputEditText>(R.id.dialog_color_red).text.toString().toInt()
+                                    val green = findViewById<TextInputEditText>(R.id.dialog_color_green).text.toString().toInt()
+                                    val blue = findViewById<TextInputEditText>(R.id.dialog_color_blue).text.toString().toInt()
+                                    viewModel.changeFolderColor(position, red, green, blue)
+                                    folderColorAlertDialog.dismiss()
+                                }
+                                findViewById<MaterialButton>(R.id.btn_cancel).setOnClickListener {
+                                    folderColorAlertDialog.dismiss()
+                                }
+                            }
+                        }
+                        R.id.change_name -> {
+                            val folderInfoView =
+                                LayoutInflater.from(context).inflate(R.layout.dialog_folder_info, null)
+                            val folderAlertDialog = AlertDialog.Builder(context)
+                                .setView(folderInfoView)
+                                .show()
+                            folderInfoView.apply {
+                                findViewById<MaterialTextView>(R.id.title).text = context.getString(R.string.title_folder_change_name)
+                                findViewById<MaterialButton>(R.id.btn_confirm).setOnClickListener {
+                                    val folderName = findViewById<TextInputEditText>(R.id.dialog_folder_name).text.toString()
+                                    viewModel.changeFolderName(position, folderName)
+                                    folderAlertDialog.dismiss()
+                                }
+                                findViewById<MaterialButton>(R.id.btn_cancel).setOnClickListener {
+                                    folderAlertDialog.dismiss()
+                                }
+                            }
+                        }
+                    }
+                    true
+                }
+                popupMenu.show()
+            }
         }
     }
 

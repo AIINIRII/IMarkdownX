@@ -10,8 +10,11 @@ import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_edit.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.adapter.FileItemAdapter
 import xyz.aiinirii.imarkdownx.databinding.FragmentPrivacyBinding
@@ -47,16 +50,28 @@ class PrivacyFragment : Fragment() {
 
         // init file item adapter
         val fileItemAdapter = FileItemAdapter(viewModel.files.value)
-        viewModel.files.observe(this.viewLifecycleOwner) {
-            fileItemAdapter.setFileItemList(it)
+
+        viewModel.folder.observe(viewLifecycleOwner) {
+            it.observe(viewLifecycleOwner) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    viewModel.findFilesByFolder()
+                }
+            }
         }
 
+        viewModel.filesInFolderInitialized.observe(viewLifecycleOwner) { filesInFolderIsInitialized ->
+            if (filesInFolderIsInitialized) {
+                viewModel.filesInFolder.observe(viewLifecycleOwner) {
+                    fileItemAdapter.setFileItemList(it)
+                }
+            }
+        }
         // set action when click file item
         fileItemAdapter.onItemClickListener = object : FileItemAdapter.OnItemClickListener {
             override fun onItemClick(view: View, position: Int) {
                 val intent = Intent(activity, EditMainActivity::class.java)
                 intent.putExtra("is_new", false)
-                intent.putExtra("file_id", viewModel.files.value?.get(position)?.id)
+                intent.putExtra("file_id", viewModel.filesInFolder.value?.get(position)?.id)
                 startActivity(intent)
             }
         }
@@ -65,7 +80,7 @@ class PrivacyFragment : Fragment() {
         fileItemAdapter.onItemLongClickListener = object : FileItemAdapter.OnItemLongClickListener {
             override fun onItemLongClick(view: View, position: Int) {
                 val popupMenu = PopupMenu(requireContext(), view)
-                popupMenu.menuInflater.inflate(R.menu.item_long_click_private_menu, popupMenu.menu)
+                popupMenu.menuInflater.inflate(R.menu.file_item_long_click_private_menu, popupMenu.menu)
 
                 popupMenu.setOnMenuItemClickListener {
                     when (it.itemId) {
@@ -96,6 +111,7 @@ class PrivacyFragment : Fragment() {
         // set action when click fab_add_task
         fab_add_task.setOnClickListener {
             val intent = Intent(activity, EditMainActivity::class.java)
+            intent.putExtra("folder_id", viewModel.folder.value!!.value!!.id)
             intent.putExtra("is_new", true)
             intent.putExtra("is_privacy", true)
             startActivity(intent)
