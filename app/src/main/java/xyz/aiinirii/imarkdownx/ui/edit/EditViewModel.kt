@@ -3,6 +3,7 @@ package xyz.aiinirii.imarkdownx.ui.edit
 import android.graphics.Color
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.IMarkdownXApplication.Companion.context
 import xyz.aiinirii.imarkdownx.R
@@ -14,7 +15,6 @@ import xyz.aiinirii.imarkdownx.entity.File
 import xyz.aiinirii.imarkdownx.entity.Folder
 import java.util.*
 
-// todo: save the folder info in this class and create one if none.
 /**
  * view model for edit page
  * @constructor
@@ -25,6 +25,7 @@ class EditViewModel : ViewModel() {
     private val folderRepository: FolderRepository
 
     val folders = MutableLiveData<LiveData<List<Folder>>>()
+    val isLoadingFiles = MutableLiveData<Boolean>()
 
     val privatePasswordVerified = MutableLiveData<Int>().apply { this.postValue(0) }
 
@@ -38,6 +39,8 @@ class EditViewModel : ViewModel() {
 
     var folder = MutableLiveData<LiveData<Folder?>>()
     lateinit var filesInFolder: LiveData<List<File>>
+
+    val folderDeleteSignal = MutableLiveData<Boolean>()
 
     val toolbarTitle = MutableLiveData<String>()
 
@@ -62,14 +65,14 @@ class EditViewModel : ViewModel() {
 
     suspend fun findFilesByFolder(): LiveData<List<File>> {
         val currentFolder: Folder
-        if (folder.value!!.value == null) {
+        if (folder.value?.value == null) {
             val newFolder =
                 Folder(context.getString(R.string.default_folder_name), context.getColor(R.color.colorPrimaryDark))
             val id = folderRepository.insert(newFolder)
             newFolder.id = id
             currentFolder = newFolder
         } else {
-            currentFolder = folder.value!!.value!!
+            currentFolder = folder.value?.value!!
         }
         filesInFolder = fileRepository.findUnlockedFilesByFolder(currentFolder)
         _filesInFolderInitialized.postValue(true)
@@ -77,7 +80,7 @@ class EditViewModel : ViewModel() {
     }
 
     fun checkPrivatePassword(userLocalId: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             if (havePrivatePassword(userLocalId)) {
                 _isHavePrivatePassword.postValue(1)
             } else {
@@ -92,22 +95,23 @@ class EditViewModel : ViewModel() {
     }
 
     fun deleteItem(position: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             val deleteFile = filesInFolder.value?.get(position)
             if (deleteFile != null) {
                 fileRepository.delete(deleteFile)
             }
-            fileRepository.refresh()
+
+            findFilesByFolder()
         }
     }
 
     fun lockItem(position: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             val lockedFile = filesInFolder.value?.get(position)
             if (lockedFile != null) {
                 fileRepository.lock(lockedFile)
             }
-            fileRepository.refresh()
+            findFilesByFolder()
         }
     }
 
@@ -120,14 +124,8 @@ class EditViewModel : ViewModel() {
     }
 
 
-    fun refresh() {
-        viewModelScope.launch(Dispatchers.IO) {
-            fileRepository.refresh()
-        }
-    }
-
     fun createFolder(folderName: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             val rand = Random(System.currentTimeMillis())
             val folder = Folder(folderName, Color.rgb(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256)))
             folderRepository.insert(folder)
@@ -135,17 +133,25 @@ class EditViewModel : ViewModel() {
     }
 
     fun deleteFolderItem(position: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             val deleteFolder = folders.value!!.value?.get(position)
             if (deleteFolder != null) {
-                folderRepository.delete(deleteFolder)
+                if (folders.value!!.value!!.size > 1) {
+                    folderRepository.delete(deleteFolder)
+                    folderDeleteSignal.postValue(true)
+                } else {
+                    folderDeleteSignal.postValue(false)
+                }
+                if (deleteFolder.id == folder.value?.value?.id) {
+                    folder.postValue(folderRepository.findFirstFolder())
+                }
             }
             folders.postValue(folderRepository.findAllFolders())
         }
     }
 
     fun changeFolderColor(position: Int, red: Int, green: Int, blue: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             val updateFolder = folders.value!!.value?.get(position)
             updateFolder?.color = Color.rgb(red, green, blue)
             if (updateFolder != null) {
@@ -156,7 +162,7 @@ class EditViewModel : ViewModel() {
     }
 
     fun changeFolderName(position: Int, folderName: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             val updateFolder = folders.value!!.value?.get(position)
             updateFolder?.name = folderName
             if (updateFolder != null) {

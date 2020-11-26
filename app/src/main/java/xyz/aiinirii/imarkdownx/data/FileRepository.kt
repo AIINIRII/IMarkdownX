@@ -54,6 +54,7 @@ class FileRepository(private val fileDao: FileDao) {
     fun findUnlockedFilesByFolder(folder: Folder): LiveData<List<File>> {
         return fileDao.loadAllUnLockedFilesByFolderId(folder.id)
     }
+
     fun findLockedFilesByFolder(folder: Folder): LiveData<List<File>> {
         return fileDao.loadAllLockedFilesByFolderId(folder.id)
     }

@@ -18,6 +18,7 @@ import io.noties.markwon.editor.MarkwonEditor
 import io.noties.markwon.editor.MarkwonEditorTextWatcher
 import kotlinx.android.synthetic.main.fragment_edit_main.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.IMarkdownXApplication
 import xyz.aiinirii.imarkdownx.R
@@ -264,7 +265,8 @@ class EditMainFragment : Fragment() {
                 R.id.btn_render -> {
                     viewModel.renderFile()
                 }
-                else -> {
+                R.id.btn_save -> {
+                    viewModel.saveFile()
                 }
             }
             true
@@ -292,12 +294,11 @@ class EditMainFragment : Fragment() {
     }
 
     override fun onStop() {
-        fragmentEditMainBinding.viewModel?.saveFile()
+        fragmentEditMainBinding.viewModel!!.saveFile()
         super.onStop()
     }
 
     override fun onDestroyView() {
-        fragmentEditMainBinding.viewModel?.saveFile()
         super.onDestroyView()
     }
 
@@ -309,7 +310,7 @@ class EditMainFragment : Fragment() {
                 val dataUri = data?.data
 
                 val fileUri = loadFileUri(dataUri)
-                lifecycleScope.launch(Dispatchers.IO) {
+                GlobalScope.launch(Dispatchers.IO) {
                     Thread.sleep(200)
                     fragmentEditMainBinding.viewModel!!.setImageUri(fileUri.toString())
                 }

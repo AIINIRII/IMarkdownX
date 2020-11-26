@@ -20,9 +20,8 @@ class PrivacyViewModel : ViewModel() {
     val filesInFolderInitialized: LiveData<Boolean>
         get() = _filesInFolderInitialized
 
-    val files: LiveData<List<File>>
     var folder = MutableLiveData<LiveData<Folder?>>()
-    val folders: LiveData<List<Folder>>
+    private val folders: LiveData<List<Folder>>
     lateinit var filesInFolder: LiveData<List<File>>
 
     init {
@@ -32,7 +31,6 @@ class PrivacyViewModel : ViewModel() {
         fileRepository = FileRepository(fileDao)
         folderRepository = FolderRepository(folderDao)
         folders = folderRepository.findAllFolders()
-        files = fileRepository.lockedFile
         folder.postValue(folderRepository.findFirstFolder())
     }
 
@@ -41,8 +39,11 @@ class PrivacyViewModel : ViewModel() {
         if (folder.value!!.value == null) {
             val newFolder =
                 Folder(
-                    IMarkdownXApplication.context.getString(R.string.default_folder_name), IMarkdownXApplication.context.getColor(
-                        R.color.colorPrimaryDark))
+                    IMarkdownXApplication.context.getString(R.string.default_folder_name),
+                    IMarkdownXApplication.context.getColor(
+                        R.color.colorPrimaryDark
+                    )
+                )
             val id = folderRepository.insert(newFolder)
             newFolder.id = id
             currentFolder = newFolder
@@ -56,21 +57,21 @@ class PrivacyViewModel : ViewModel() {
 
     fun unlockItem(position: Int) {
         viewModelScope.launch {
-            val lockedFile = files.value?.get(position)
+            val lockedFile = filesInFolder.value?.get(position)
             if (lockedFile != null) {
                 fileRepository.unlock(lockedFile)
             }
-            fileRepository.refresh()
+            findFilesByFolder()
         }
     }
 
     fun deleteItem(position: Int) {
         viewModelScope.launch {
-            val deleteFile = files.value?.get(position)
+            val deleteFile = filesInFolder.value?.get(position)
             if (deleteFile != null) {
                 fileRepository.delete(deleteFile)
             }
-            fileRepository.refresh()
+            findFilesByFolder()
         }
     }
 

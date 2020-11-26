@@ -61,6 +61,12 @@ object MarkwonBuilder {
         .usePlugin(HtmlPlugin.create())
         .usePlugin(StrikethroughPlugin.create())
         .usePlugin(TablePlugin.create(context))
-        .usePlugin(TaskListPlugin.create(context.getColor(R.color.colorPrimary), context.getColor(R.color.colorPrimary), context.getColor(R.color.colorPrimaryDark)))
+        .usePlugin(
+            TaskListPlugin.create(
+                context.getColor(R.color.colorPrimary),
+                context.getColor(R.color.colorPrimary),
+                context.getColor(R.color.colorPrimaryDark)
+            )
+        )
         .build()
 }

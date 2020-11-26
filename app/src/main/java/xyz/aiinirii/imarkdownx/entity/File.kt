@@ -20,7 +20,8 @@ class File(var name: String, var date: String, var content: String, var locked: 
         parentColumns = ["id"],
         childColumns = ["folderId"],
         onDelete = CASCADE,
-        onUpdate = CASCADE)
+        onUpdate = CASCADE
+    )
     var folderId: Long = 0
 
     override fun toString(): String {

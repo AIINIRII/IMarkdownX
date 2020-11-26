@@ -21,10 +21,10 @@ class FolderRepository(private val folderDao: FolderDao) {
     }
 
     fun findFirstFolder(): LiveData<Folder?> {
-        return  folderDao.findFirstFolder()
+        return folderDao.findFirstFolder()
     }
 
-    suspend fun insert(newFolder: Folder):Long {
+    suspend fun insert(newFolder: Folder): Long {
         return folderDao.insert(newFolder)
     }
 

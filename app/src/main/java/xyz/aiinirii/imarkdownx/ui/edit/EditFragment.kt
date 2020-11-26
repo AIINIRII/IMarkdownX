@@ -1,12 +1,13 @@
 package xyz.aiinirii.imarkdownx.ui.edit
 
 import android.app.AlertDialog
+import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.hardware.fingerprint.FingerprintManager
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,10 +28,12 @@ import com.google.android.material.textview.MaterialTextView
 import kotlinx.android.synthetic.main.dialog_private_valid.view.*
 import kotlinx.android.synthetic.main.fragment_edit.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.adapter.FileItemAdapter
 import xyz.aiinirii.imarkdownx.adapter.FolderItemAdapter
+import xyz.aiinirii.imarkdownx.base.BaseFingerprintDialog
 import xyz.aiinirii.imarkdownx.databinding.FragmentEditBinding
 import xyz.aiinirii.imarkdownx.ui.changeprivatepassword.ChangePrivatePasswordActivity
 import xyz.aiinirii.imarkdownx.ui.edit.main.EditMainActivity
@@ -39,13 +42,13 @@ import xyz.aiinirii.imarkdownx.ui.edit.privacy.PrivacyActivity
 private const val TAG = "EditFragment"
 
 class EditFragment : Fragment() {
+
+
     lateinit var sharedPreferences: SharedPreferences
 
-    companion object {
-        fun newInstance() = EditFragment()
-    }
-
     lateinit var fragmentEditBinding: FragmentEditBinding
+
+    var firstStart = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -117,11 +120,18 @@ class EditFragment : Fragment() {
 
         viewModel.folder.observe(viewLifecycleOwner) { folderLiveData ->
             folderLiveData.observe(viewLifecycleOwner) {
+                Log.d(TAG, "onActivityCreated: switch to folder: $it")
                 viewModel.toolbarTitle.postValue(it?.name)
-                lifecycleScope.launch(Dispatchers.IO) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    viewModel.isLoadingFiles.postValue(true)
                     viewModel.findFilesByFolder()
+                    viewModel.isLoadingFiles.postValue(false)
                 }
             }
+        }
+
+        viewModel.isLoadingFiles.observe(viewLifecycleOwner) {
+            swipe_refresh_edit.isRefreshing = it
         }
 
         viewModel.filesInFolderInitialized.observe(viewLifecycleOwner) { filesInFolderIsInitialized ->
@@ -136,8 +146,10 @@ class EditFragment : Fragment() {
 
         // set refresh action
         swipe_refresh_edit.setOnRefreshListener {
-            viewModel.refresh()
-            swipe_refresh_edit.isRefreshing = false
+            lifecycleScope.launch(Dispatchers.IO) {
+                viewModel.findFilesByFolder()
+                swipe_refresh_edit.isRefreshing = false
+            }
         }
 
         // set recycler list view
@@ -167,13 +179,21 @@ class EditFragment : Fragment() {
             }
         }
 
+        viewModel.folderDeleteSignal.observe(viewLifecycleOwner) {
+            if (it) {
+                Toast.makeText(context, getString(R.string.toast_delete_success), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, getString(R.string.toast_delete_failed), Toast.LENGTH_SHORT).show()
+            }
+        }
+
         // setup is have private password logic
         viewModel.isHavePrivatePassword.observe(viewLifecycleOwner) { isHavePrivatePassword ->
             var alertDialog: AlertDialog? = null
             val view = LayoutInflater.from(activity).inflate(R.layout.dialog_private_valid, null)
             view.btn_confirm.setOnClickListener {
                 val password = view.findViewById<TextInputEditText>(R.id.dialog_password).text ?: ""
-                lifecycleScope.launch(Dispatchers.IO) {
+                GlobalScope.launch(Dispatchers.IO) {
                     if (userLocalId != -1L) {
                         val verifyPrivatePassword =
                             viewModel.verifyPrivatePassword(userLocalId, password.toString())
@@ -194,10 +214,35 @@ class EditFragment : Fragment() {
             when (isHavePrivatePassword) {
                 // if the user have the private password
                 1 -> {
-                    // alert a dialog and let user enter
-                    alertDialog = AlertDialog.Builder(requireActivity())
-                        .setView(view)
-                        .show()
+                    if (supportFingerPrint()) {
+                        val fingerprintDialog = BaseFingerprintDialog()
+                        fingerprintDialog.onAuthenticationSucceededListener =
+                            object : BaseFingerprintDialog.OnAuthenticationSucceededListener {
+                                override fun onAuthenticationSucceeded(result: FingerprintManager.AuthenticationResult?) {
+                                    viewModel.privatePasswordVerified.postValue(1)
+                                    fingerprintDialog.dismiss()
+                                }
+                            }
+                        fingerprintDialog.onAuthenticationFailedListener =
+                            object : BaseFingerprintDialog.OnAuthenticationFailedListener {
+                                override fun onAuthenticationFailed() {
+                                    Toast.makeText(
+                                        context,
+                                        getString(R.string.toast_failed_verify_fingerprint),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        fingerprintDialog.show(
+                            requireActivity().supportFragmentManager,
+                            getString(R.string.dialog_verify_fingerprint)
+                        )
+                    } else {
+                        // alert a dialog and let user enter
+                        alertDialog = AlertDialog.Builder(requireActivity())
+                            .setView(view)
+                            .show()
+                    }
                 }
                 // if the user do not have the private password
                 2 -> {
@@ -221,7 +266,21 @@ class EditFragment : Fragment() {
         }
 
         val drawerToggle =
-            ActionBarDrawerToggle(activity, drawer_layout, toolbar_edit, R.string.app_name, R.string.app_name)
+            object :
+                ActionBarDrawerToggle(activity, drawer_layout, toolbar_edit, R.string.app_name, R.string.app_name) {
+
+                override fun onDrawerOpened(drawerView: View) {
+                    super.onDrawerOpened(drawerView)
+                    fab_add_folder.show()
+                    fab_add_task.hide()
+                }
+
+                override fun onDrawerClosed(drawerView: View) {
+                    super.onDrawerClosed(drawerView)
+                    fab_add_task.show()
+                    fab_add_folder.hide()
+                }
+            }
 
         drawerToggle.syncState()
 
@@ -229,23 +288,30 @@ class EditFragment : Fragment() {
 
         toolbar_edit.setNavigationOnClickListener {
             if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-                hideDrawer()
+                drawer_layout.closeDrawer(GravityCompat.START)
             } else {
-                openDrawer()
+                drawer_layout.openDrawer(GravityCompat.START)
             }
         }
     }
 
-    private fun hideDrawer() {
-        drawer_layout.closeDrawer(GravityCompat.START)
-        fab_add_folder.hide()
-        fab_add_task.show()
-    }
-
-    private fun openDrawer() {
-        drawer_layout.openDrawer(GravityCompat.START)
-        fab_add_task.hide()
-        fab_add_folder.show()
+    private fun supportFingerPrint(): Boolean {
+        val keyguardManager: KeyguardManager = requireContext().getSystemService(KeyguardManager::class.java)
+        val fingerprintManager: FingerprintManager = requireContext().getSystemService(FingerprintManager::class.java)
+        if (!fingerprintManager.isHardwareDetected) {
+            // Toast.makeText(this, "your phone do not support finger", Toast.LENGTH_SHORT).show()
+            Log.i(TAG, "supportFingerPrint: your phone do not support fingerprint")
+            return false
+        } else if (!keyguardManager.isKeyguardSecure) {
+            // Toast.makeText(this, "您还未设置锁屏，请先设置锁屏并添加一个指纹", Toast.LENGTH_SHORT).show()
+            Log.i(TAG, "supportFingerPrint: haven't set fingerprint")
+            return false
+        } else if (!fingerprintManager.hasEnrolledFingerprints()) {
+            // Toast.makeText(this, "您至少需要在系统设置中添加一个指纹", Toast.LENGTH_SHORT).show()
+            Log.i(TAG, "supportFingerPrint: have to add a fingerprint")
+            return false
+        }
+        return true
     }
 
     private fun initFileItemClickAction(
@@ -284,6 +350,17 @@ class EditFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!firstStart) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                fragmentEditBinding.viewModel?.findFilesByFolder()
+            }
+        } else {
+            firstStart = false
+        }
+    }
+
     private fun initFolderItemClickAction(
         folderItemAdapter: FolderItemAdapter,
         viewModel: EditViewModel
@@ -295,7 +372,7 @@ class EditFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.IO) {
                     viewModel.updateFilesInFolderByFolder(folder)
                 }
-                hideDrawer()
+                drawer_layout.closeDrawer(GravityCompat.START)
             }
         }
 
@@ -317,9 +394,12 @@ class EditFragment : Fragment() {
                                 .show()
                             folderColorInfoView.apply {
                                 findViewById<MaterialButton>(R.id.btn_confirm).setOnClickListener {
-                                    val red = findViewById<TextInputEditText>(R.id.dialog_color_red).text.toString().toInt()
-                                    val green = findViewById<TextInputEditText>(R.id.dialog_color_green).text.toString().toInt()
-                                    val blue = findViewById<TextInputEditText>(R.id.dialog_color_blue).text.toString().toInt()
+                                    val red =
+                                        findViewById<TextInputEditText>(R.id.dialog_color_red).text.toString().toInt()
+                                    val green =
+                                        findViewById<TextInputEditText>(R.id.dialog_color_green).text.toString().toInt()
+                                    val blue =
+                                        findViewById<TextInputEditText>(R.id.dialog_color_blue).text.toString().toInt()
                                     viewModel.changeFolderColor(position, red, green, blue)
                                     folderColorAlertDialog.dismiss()
                                 }
@@ -335,9 +415,11 @@ class EditFragment : Fragment() {
                                 .setView(folderInfoView)
                                 .show()
                             folderInfoView.apply {
-                                findViewById<MaterialTextView>(R.id.title).text = context.getString(R.string.title_folder_change_name)
+                                findViewById<MaterialTextView>(R.id.title).text =
+                                    context.getString(R.string.title_folder_change_name)
                                 findViewById<MaterialButton>(R.id.btn_confirm).setOnClickListener {
-                                    val folderName = findViewById<TextInputEditText>(R.id.dialog_folder_name).text.toString()
+                                    val folderName =
+                                        findViewById<TextInputEditText>(R.id.dialog_folder_name).text.toString()
                                     viewModel.changeFolderName(position, folderName)
                                     folderAlertDialog.dismiss()
                                 }

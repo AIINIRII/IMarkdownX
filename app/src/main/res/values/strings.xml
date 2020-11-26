@@ -73,4 +73,9 @@
     <string name="dialog_input_green">G</string>
     <string name="dialog_input_blue">B</string>
     <string name="title_folder_change_name">Change name to:</string>
+    <string name="fingerprint_verify_fingerprint_to_continue">verify fingerprint to continue</string>
+    <string name="dialog_verify_fingerprint">Verify finger print</string>
+    <string name="toast_failed_verify_fingerprint">failed to verify fingerprint</string>
+    <string name="toast_delete_success">delete successfully!</string>
+    <string name="toast_delete_failed">can not delete the last folder!</string>
 </resources>

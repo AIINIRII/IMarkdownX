@@ -3,12 +3,12 @@ package xyz.aiinirii.imarkdownx.ui.edit.main
 import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import xyz.aiinirii.imarkdownx.IMarkdownXApplication
 import xyz.aiinirii.imarkdownx.data.FileRepository
 import xyz.aiinirii.imarkdownx.db.AppDatabase
 import xyz.aiinirii.imarkdownx.entity.File
-import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -174,11 +174,11 @@ class EditMainViewModel : ViewModel() {
             currentFile.folderId = this@EditMainViewModel.folderId
             Log.d(TAG, "saveFile: begin to create file: $currentFile")
             Log.d(TAG, "saveFile: set content: ${currentFile.content}, set date: ${currentFile.date}")
-            viewModelScope.launch(Dispatchers.IO) {
+            GlobalScope.launch(Dispatchers.IO) {
                 currentFile.id = repository.insert(currentFile)
+                Log.d(TAG, "saveFile: successfully save the file with id: ${currentFile.id}")
                 file = liveData { emit(currentFile) }
             }
-            Log.d(TAG, "saveFile: successfully save the file")
         }
         isSaved.postValue(true)
     }

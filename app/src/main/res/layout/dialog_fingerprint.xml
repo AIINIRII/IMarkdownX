@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/spacing_normal"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="@dimen/width_tiny"
+        android:layout_height="@dimen/width_small"
+        android:layout_gravity="center_horizontal"
+        android:paddingVertical="@dimen/spacing_normal"
+        android:src="@drawable/ic_fingerprint" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/spacing_normal"
+        android:text="@string/fingerprint_verify_fingerprint_to_continue"
+        android:textColor="@color/colorDark"
+        android:textSize="@dimen/font_normal" />
+
+    <TextView
+        android:id="@+id/error_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/spacing_tiny"
+        android:maxLines="1"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/font_normal" />
+
+    <TextView
+        android:id="@+id/btn_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/btn_cancel"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/font_large" />
+
+</LinearLayout>

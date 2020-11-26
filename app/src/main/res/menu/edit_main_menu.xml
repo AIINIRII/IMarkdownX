@@ -6,4 +6,9 @@
         android:icon="@drawable/ic_markdown"
         android:title="@string/btn_render"
         app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/btn_save"
+        android:title="@string/btn_save"
+        android:icon="@drawable/ic_save"
+        app:showAsAction="ifRoom" />
 </menu>

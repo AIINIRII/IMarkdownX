@@ -49,7 +49,7 @@ class PrivacyFragment : Fragment() {
         val viewModel = fragmentPrivacyBinding.viewModel!!
 
         // init file item adapter
-        val fileItemAdapter = FileItemAdapter(viewModel.files.value)
+        val fileItemAdapter = FileItemAdapter(null)
 
         viewModel.folder.observe(viewLifecycleOwner) {
             it.observe(viewLifecycleOwner) {
@@ -99,8 +99,10 @@ class PrivacyFragment : Fragment() {
 
         // set refresh action
         swipe_refresh_edit.setOnRefreshListener {
-            viewModel.refresh()
-            swipe_refresh_edit.isRefreshing = false
+            lifecycleScope.launch(Dispatchers.IO) {
+                viewModel.findFilesByFolder()
+                swipe_refresh_edit.isRefreshing = false
+            }
         }
 
         // set recycler list view

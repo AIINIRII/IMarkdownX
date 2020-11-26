@@ -17,7 +17,8 @@ import xyz.aiinirii.imarkdownx.entity.Folder
  *
  * @author AIINIRII
  */
-class FolderItemAdapter (private var folderItemList: List<Folder>?) : RecyclerView.Adapter<FolderItemAdapter.ViewHolder>() {
+class FolderItemAdapter(private var folderItemList: List<Folder>?) :
+    RecyclerView.Adapter<FolderItemAdapter.ViewHolder>() {
 
     var onItemClickListener: OnItemClickListener? = null
     var onItemLongClickListener: OnItemLongClickListener? = null

@@ -12,13 +12,13 @@ import xyz.aiinirii.imarkdownx.entity.Folder
 interface FolderDao {
 
     @Insert
-    suspend fun insert(folder:Folder):Long
+    suspend fun insert(folder: Folder): Long
 
     @Update
-    suspend fun update(folder:Folder)
+    suspend fun update(folder: Folder)
 
     @Delete
-    suspend fun delete(folder:Folder)
+    suspend fun delete(folder: Folder)
 
     @Query("select * from folder")
     fun findAllFolders(): LiveData<List<Folder>>
