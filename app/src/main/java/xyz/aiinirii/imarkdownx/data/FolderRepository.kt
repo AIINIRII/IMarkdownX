@@ -1,8 +1,10 @@
 package xyz.aiinirii.imarkdownx.data
 
+import android.graphics.Color
 import androidx.lifecycle.LiveData
 import xyz.aiinirii.imarkdownx.data.dao.FolderDao
 import xyz.aiinirii.imarkdownx.entity.Folder
+import java.util.*
 
 /**
  *
@@ -34,6 +36,19 @@ class FolderRepository(private val folderDao: FolderDao) {
 
     suspend fun update(updateFolder: Folder) {
         folderDao.update(updateFolder)
+    }
+
+    suspend fun createFolderIfNotExist(folderId: Long) {
+        val folderFound = folderDao.findById(folderId)
+        val rand = Random()
+        if (folderFound == null) {
+            folderDao.insert(
+                Folder(
+                    "remote folder",
+                    Color.rgb(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256))
+                )
+            )
+        }
     }
 
 }

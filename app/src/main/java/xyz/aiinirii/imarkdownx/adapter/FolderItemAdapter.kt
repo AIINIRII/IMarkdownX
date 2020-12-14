@@ -12,7 +12,6 @@ import xyz.aiinirii.imarkdownx.IMarkdownXApplication.Companion.context
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.entity.Folder
 
-// todo: implement folder item adapter and implement the folder list
 /**
  *
  * @author AIINIRII

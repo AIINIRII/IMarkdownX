@@ -1,13 +1,291 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.my.MyFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.textview.MaterialTextView
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="xyz.aiinirii.imarkdownx.ui.my.MyViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello" />
+        android:layout_height="match_parent">
 
-</FrameLayout>
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar_edit"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+                app:title="@string/my_title"
+                app:titleTextColor="@color/colorWhite" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+
+        <FrameLayout
+            android:id="@+id/frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appBarLayout">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorWhite"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/spacing_small"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/header_pic"
+                        android:layout_width="@dimen/width_small"
+                        android:layout_height="@dimen/width_small"
+                        android:background="@drawable/circle_header_background"
+                        android:contentDescription="@string/header_description"
+                        android:padding="@dimen/spacing_small"
+                        android:src="@drawable/header_01"
+                        tools:src="@drawable/header_01" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/username"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/spacing_normal"
+                                android:text="@{viewModel.usernameInitial}"
+                                android:textSize="@dimen/font_hugehuge"
+                                tools:text="A" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{viewModel.usernameWithOutInitial}"
+                                android:textSize="@dimen/font_huge"
+                                tools:text="IINIRII" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/postNumber"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="@dimen/spacing_normal"
+                            android:text="@{viewModel.notesCountText}"
+                            android:textSize="@dimen/font_larger"
+                            tools:text="you have totally 120 notes!" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/line1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorLight"
+                    android:orientation="horizontal"
+                    android:visibility="@{viewModel.isGuest()?View.GONE:View.VISIBLE}"
+                    app:layout_constraintTop_toBottomOf="@id/header" />
+
+                <TextView
+                    android:id="@+id/btn_sync"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/item_file_background"
+                    android:gravity="center"
+                    android:onClick="@{() -> viewModel.sync()}"
+                    android:paddingVertical="@dimen/spacing_small"
+                    android:text="@string/synchronize_notes_text"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/font_larger"
+                    android:visibility="@{viewModel.isGuest()?View.GONE:View.VISIBLE}"
+                    app:layout_constraintTop_toBottomOf="@id/line1" />
+
+                <LinearLayout
+                    android:id="@+id/line2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorLight"
+                    android:orientation="horizontal"
+                    android:visibility="@{viewModel.isGuest()?View.VISIBLE:View.GONE}"
+                    app:layout_constraintTop_toBottomOf="@id/btn_sync" />
+
+                <TextView
+                    android:id="@+id/btn_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/item_file_background"
+                    android:gravity="center"
+                    android:onClick="@{()->viewModel.login()}"
+                    android:paddingVertical="@dimen/spacing_small"
+                    android:text="@string/login"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/font_larger"
+                    android:visibility="@{viewModel.isGuest()?View.VISIBLE:View.GONE}"
+                    app:layout_constraintTop_toBottomOf="@id/line2" />
+
+                <LinearLayout
+                    android:id="@+id/line3"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorLight"
+                    android:orientation="horizontal"
+                    android:visibility="@{viewModel.isGuest()?View.VISIBLE:View.GONE}"
+                    app:layout_constraintTop_toBottomOf="@id/btn_login" />
+
+                <TextView
+                    android:id="@+id/btn_register"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/item_file_background"
+                    android:gravity="center"
+                    android:onClick="@{()->viewModel.register()}"
+                    android:paddingVertical="@dimen/spacing_small"
+                    android:text="@string/register"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/font_larger"
+                    android:visibility="@{viewModel.isGuest()?View.VISIBLE:View.GONE}"
+                    app:layout_constraintTop_toBottomOf="@id/line3" />
+
+                <LinearLayout
+                    android:id="@+id/line4"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorLight"
+                    android:orientation="horizontal"
+                    android:visibility="@{viewModel.isGuest()?View.GONE:View.VISIBLE}"
+                    app:layout_constraintTop_toBottomOf="@id/btn_register" />
+
+                <TextView
+                    android:id="@+id/btn_update_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/item_file_background"
+                    android:gravity="center"
+                    android:onClick="@{() -> viewModel.updateInfo()}"
+                    android:paddingVertical="@dimen/spacing_small"
+                    android:text="@string/update_userinfo_text"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/font_larger"
+                    android:visibility="@{viewModel.isGuest()?View.GONE:View.VISIBLE}"
+                    app:layout_constraintTop_toBottomOf="@id/line4" />
+
+                <LinearLayout
+                    android:id="@+id/line11"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorLight"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/btn_update_info" />
+
+                <TextView
+                    android:id="@+id/btn_change_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/item_file_background"
+                    android:gravity="center"
+                    android:onClick="@{() -> viewModel.changePassword()}"
+                    android:paddingVertical="@dimen/spacing_small"
+                    android:text="@string/btn_change_password"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/font_larger"
+                    app:layout_constraintTop_toBottomOf="@id/line11" />
+
+                <LinearLayout
+                    android:id="@+id/line7"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorLight"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/btn_change_password" />
+
+                <LinearLayout
+                    android:id="@+id/line6"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorLight"
+                    android:orientation="horizontal"
+                    android:visibility="@{viewModel.isGuest()?View.GONE:View.VISIBLE}"
+                    app:layout_constraintBottom_toTopOf="@id/btn_delete" />
+
+                <TextView
+                    android:id="@+id/btn_delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/spacing_tiny"
+                    android:background="@drawable/item_file_background"
+                    android:gravity="center"
+                    android:onClick="@{() -> viewModel.delete()}"
+                    android:paddingVertical="@dimen/spacing_small"
+                    android:text="@string/delete_account_text"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="@dimen/font_larger"
+                    android:visibility="@{viewModel.isGuest()?View.GONE:View.VISIBLE}"
+                    app:layout_constraintBottom_toTopOf="@id/line5" />
+
+                <LinearLayout
+                    android:id="@+id/line5"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorLight"
+                    android:orientation="horizontal"
+                    android:visibility="@{viewModel.isGuest()?View.GONE:View.VISIBLE}"
+                    app:layout_constraintBottom_toTopOf="@id/btn_logout" />
+
+                <TextView
+                    android:id="@+id/btn_logout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/spacing_tiny"
+                    android:background="@drawable/item_file_background"
+                    android:gravity="center"
+                    android:onClick="@{() -> viewModel.logout()}"
+                    android:paddingVertical="@dimen/spacing_small"
+                    android:text="@string/logout_text"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="@dimen/font_larger"
+                    android:visibility="@{viewModel.isGuest()?View.GONE:View.VISIBLE}"
+                    app:layout_constraintBottom_toTopOf="@id/line9" />
+
+                <LinearLayout
+                    android:id="@+id/line9"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="@dimen/spacing_normal"
+                    android:background="@color/colorLight"
+                    android:orientation="horizontal"
+                    android:visibility="@{viewModel.isGuest()?View.GONE:View.VISIBLE}"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

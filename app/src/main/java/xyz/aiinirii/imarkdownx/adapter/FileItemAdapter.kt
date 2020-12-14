@@ -1,10 +1,13 @@
 package xyz.aiinirii.imarkdownx.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
+import xyz.aiinirii.imarkdownx.IMarkdownXApplication
 import xyz.aiinirii.imarkdownx.R
 import xyz.aiinirii.imarkdownx.entity.File
 
@@ -13,7 +16,7 @@ import xyz.aiinirii.imarkdownx.entity.File
  * @author AIINIRII
  */
 class FileItemAdapter(private var fileItemList: List<File>?) : RecyclerView.Adapter<FileItemAdapter.ViewHolder>() {
-
+    val sharedPreferences = IMarkdownXApplication.context.getSharedPreferences("IMarkdownX", Context.MODE_PRIVATE)
     var onItemClickListener: OnItemClickListener? = null
     var onItemLongClickListener: OnItemLongClickListener? = null
 
@@ -28,6 +31,7 @@ class FileItemAdapter(private var fileItemList: List<File>?) : RecyclerView.Adap
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val fileName: MaterialTextView = view.findViewById(R.id.file_name)
         val fileDate: MaterialTextView = view.findViewById(R.id.file_date)
+        val sync: ImageView = view.findViewById(R.id.sync)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,6 +42,12 @@ class FileItemAdapter(private var fileItemList: List<File>?) : RecyclerView.Adap
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val fileItem = fileItemList?.get(position)
+        if (fileItem?.remoteId == null
+            || sharedPreferences.getString("userLocalName", "")
+            == IMarkdownXApplication.context.getString(R.string.default_username)
+        ) {
+            holder.sync.visibility = View.INVISIBLE
+        }
         holder.fileName.text = fileItem?.name ?: ""
         holder.fileDate.text = fileItem?.date ?: ""
         if (onItemClickListener != null) {

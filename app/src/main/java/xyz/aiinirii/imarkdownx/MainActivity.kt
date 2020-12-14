@@ -3,14 +3,23 @@ package xyz.aiinirii.imarkdownx
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import xyz.aiinirii.imarkdownx.data.RemoteUserRepository
+import xyz.aiinirii.imarkdownx.data.RetrofitRepository
 import xyz.aiinirii.imarkdownx.data.dao.UserDao
+import xyz.aiinirii.imarkdownx.data.model.CommonResult
+import xyz.aiinirii.imarkdownx.data.model.TokenParams
 import xyz.aiinirii.imarkdownx.db.AppDatabase
 import xyz.aiinirii.imarkdownx.entity.User
 import xyz.aiinirii.imarkdownx.utils.MD5Utils
@@ -42,6 +51,45 @@ class MainActivity : AppCompatActivity() {
                 if (user == null) {
                     addGuestAsUser(userDao, sharedPreferences)
                 }
+            }
+        }
+        val remoteUserRepository = RemoteUserRepository(RetrofitRepository.userApi)
+        val token = sharedPreferences.getString("token", "")
+        if (token != null && token != "") {
+            GlobalScope.launch(Dispatchers.IO) {
+                remoteUserRepository.refreshToken(token, object : Callback<CommonResult<TokenParams>> {
+                    override fun onResponse(
+                        call: Call<CommonResult<TokenParams>>,
+                        response: Response<CommonResult<TokenParams>>
+                    ) {
+                        if (response.body()?.code == 200) {
+                            val newToken = response.body()!!.data.let {
+                                it.tokenHead + it.token
+                            }
+                            sharedPreferences.edit()
+                                .putString("token", newToken)
+                                .apply()
+                        } else {
+                            sharedPreferences.edit()
+                                .remove("token")
+                                .putString("userLocalName", getString(R.string.default_username))
+                                .apply()
+                        }
+
+                    }
+
+                    override fun onFailure(call: Call<CommonResult<TokenParams>>, t: Throwable) {
+                        Toast.makeText(
+                            IMarkdownXApplication.context,
+                            getString(R.string.server_error_toast),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        sharedPreferences.edit()
+                            .remove("token")
+                            .putString("userLocalName", getString(R.string.default_username))
+                            .apply()
+                    }
+                })
             }
         }
     }

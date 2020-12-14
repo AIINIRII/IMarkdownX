@@ -148,6 +148,7 @@ class EditFragment : Fragment() {
         swipe_refresh_edit.setOnRefreshListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 viewModel.findFilesByFolder()
+                listview_files.adapter = fileItemAdapter
                 swipe_refresh_edit.isRefreshing = false
             }
         }
@@ -214,6 +215,7 @@ class EditFragment : Fragment() {
             when (isHavePrivatePassword) {
                 // if the user have the private password
                 1 -> {
+                    viewModel.isHavePrivatePassword.postValue(0)
                     if (supportFingerPrint()) {
                         val fingerprintDialog = BaseFingerprintDialog()
                         fingerprintDialog.onAuthenticationSucceededListener =
@@ -246,6 +248,7 @@ class EditFragment : Fragment() {
                 }
                 // if the user do not have the private password
                 2 -> {
+                    viewModel.isHavePrivatePassword.postValue(0)
                     val intent = Intent(activity, ChangePrivatePasswordActivity::class.java)
                     intent.putExtra("is_new", true)
                     startActivity(intent)
@@ -400,8 +403,16 @@ class EditFragment : Fragment() {
                                         findViewById<TextInputEditText>(R.id.dialog_color_green).text.toString().toInt()
                                     val blue =
                                         findViewById<TextInputEditText>(R.id.dialog_color_blue).text.toString().toInt()
-                                    viewModel.changeFolderColor(position, red, green, blue)
-                                    folderColorAlertDialog.dismiss()
+                                    if (red in 0..255 && green in 0..255 && blue in 0..255) {
+                                        viewModel.changeFolderColor(position, red, green, blue)
+                                        folderColorAlertDialog.dismiss()
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.color_range_toast),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                                 findViewById<MaterialButton>(R.id.btn_cancel).setOnClickListener {
                                     folderColorAlertDialog.dismiss()

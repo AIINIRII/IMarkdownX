@@ -46,9 +46,25 @@ class FileRepository(private val fileDao: FileDao) {
     }
 
     suspend fun unlock(file: File) {
-        Log.d(TAG, "unLock: unlock the file")
+        Log.d(TAG, "unLock: unlock the file: $file")
         file.locked = false
         fileDao.updateFile(file)
+    }
+
+    fun count(): Int {
+        return fileDao.countFiles()
+    }
+
+    fun getAllFiles(): List<File>{
+        return fileDao.loadAllFiles()
+    }
+
+    fun getFileByRemoteId(id:Long):File?{
+        return fileDao.getFileByRemoteId(id)
+    }
+
+    fun getAllUnlockedFiles() :List<File> {
+        return fileDao.loadAllUnLockedFilesFast()
     }
 
     fun findUnlockedFilesByFolder(folder: Folder): LiveData<List<File>> {

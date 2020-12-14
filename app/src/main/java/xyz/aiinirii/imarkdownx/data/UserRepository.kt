@@ -24,18 +24,18 @@ class UserRepository(private val userDao: UserDao) {
         userDao.updateUser(user)
     }
 
-    suspend fun get(userId: Long): User? = userDao.findUserById(userId)
+    fun get(userId: Long): User? = userDao.findUserById(userId)
 
     suspend fun delete(deleteUser: User) {
         userDao.deleteUser(deleteUser)
     }
 
-    suspend fun verifyPrivatePassword(userId: Long, privatePassword: String): Boolean {
+    fun verifyPrivatePassword(userId: Long, privatePassword: String): Boolean {
         val user = get(userId)
         return user?.let { MD5Utils.verifyMd5Code(privatePassword, it.privatePassword) } ?: false
     }
 
-    suspend fun havePrivatePassword(userId: Long): Boolean {
+    fun havePrivatePassword(userId: Long): Boolean {
         val user = get(userId)
         return user?.privatePassword != MD5Utils.getMD5Code("")
     }

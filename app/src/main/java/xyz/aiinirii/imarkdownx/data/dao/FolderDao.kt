@@ -25,4 +25,7 @@ interface FolderDao {
 
     @Query("select * from folder order by id limit 1")
     fun findFirstFolder(): LiveData<Folder?>
+
+    @Query("select * from folder where id=:folderId")
+    fun findById(folderId: Long): Folder?
 }

@@ -1,20 +1,27 @@
 package xyz.aiinirii.imarkdownx.ui.edit
 
+import android.content.Context
 import android.graphics.Color
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import xyz.aiinirii.imarkdownx.IMarkdownXApplication
 import xyz.aiinirii.imarkdownx.IMarkdownXApplication.Companion.context
 import xyz.aiinirii.imarkdownx.R
-import xyz.aiinirii.imarkdownx.data.FileRepository
-import xyz.aiinirii.imarkdownx.data.FolderRepository
-import xyz.aiinirii.imarkdownx.data.UserRepository
+import xyz.aiinirii.imarkdownx.data.*
+import xyz.aiinirii.imarkdownx.data.model.CommonResult
 import xyz.aiinirii.imarkdownx.db.AppDatabase
 import xyz.aiinirii.imarkdownx.entity.File
 import xyz.aiinirii.imarkdownx.entity.Folder
 import java.util.*
 
+private const val TAG = "EditViewModel"
 /**
  * view model for edit page
  * @constructor
@@ -23,6 +30,11 @@ class EditViewModel : ViewModel() {
     private val fileRepository: FileRepository
     private val userRepository: UserRepository
     private val folderRepository: FolderRepository
+    private val remoteFileRepository: RemoteFileRepository
+
+    private val sharedPreferences =
+        IMarkdownXApplication.context.getSharedPreferences("IMarkdownX", Context.MODE_PRIVATE)
+
 
     val folders = MutableLiveData<LiveData<List<Folder>>>()
     val isLoadingFiles = MutableLiveData<Boolean>()
@@ -30,8 +42,7 @@ class EditViewModel : ViewModel() {
     val privatePasswordVerified = MutableLiveData<Int>().apply { this.postValue(0) }
 
     private val _isHavePrivatePassword = MutableLiveData<Int>().apply { this.postValue(0) }
-    val isHavePrivatePassword: LiveData<Int>
-        get() = _isHavePrivatePassword
+    val isHavePrivatePassword = _isHavePrivatePassword
 
     private val _filesInFolderInitialized = MutableLiveData<Boolean>()
     val filesInFolderInitialized: LiveData<Boolean>
@@ -52,6 +63,7 @@ class EditViewModel : ViewModel() {
         fileRepository = FileRepository(fileDao)
         userRepository = UserRepository(userDao)
         folderRepository = FolderRepository(folderDao)
+        remoteFileRepository = RemoteFileRepository(RetrofitRepository.fileApi)
 
         folders.postValue(folderRepository.findAllFolders())
         folder.postValue(folderRepository.findFirstFolder())
@@ -99,6 +111,32 @@ class EditViewModel : ViewModel() {
             val deleteFile = filesInFolder.value?.get(position)
             if (deleteFile != null) {
                 fileRepository.delete(deleteFile)
+                if (deleteFile.remoteId != null && sharedPreferences.getString(
+                        "userLocalName",
+                        ""
+                    ) != context.getString(R.string.default_username)
+                ) {
+                    remoteFileRepository.removeFile(
+                        token = sharedPreferences.getString("token", "")!!,
+                        deleteFile.remoteId!!,
+                        object : Callback<CommonResult<String>> {
+                            override fun onResponse(
+                                call: Call<CommonResult<String>>,
+                                response: Response<CommonResult<String>>
+                            ) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.delete_remote_file_toast),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            override fun onFailure(call: Call<CommonResult<String>>, t: Throwable) {
+                                Log.e(TAG, "onFailure: ${t.message}", )
+                            }
+                        }
+                    )
+                }
             }
 
             findFilesByFolder()
