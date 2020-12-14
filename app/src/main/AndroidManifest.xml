@@ -15,6 +15,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".LauncherActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ui.user.changepassword.ChangePasswordActivity" />
         <activity android:name=".ui.user.updateinfo.UpdateInfoActivity" />
         <activity android:name=".ui.user.register.RegisterActivity" />
@@ -23,13 +30,7 @@
         <activity android:name=".ui.edit.privacy.PrivacyActivity" />
         <activity android:name=".ui.edit.render.EditRenderActivity" />
         <activity android:name=".ui.edit.main.EditMainActivity" />
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".MainActivity"/>
     </application>
 
 </manifest>

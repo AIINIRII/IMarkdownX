@@ -3,6 +3,7 @@ package xyz.aiinirii.imarkdownx.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputEditText
@@ -45,6 +46,10 @@ class TodoItemAdapter(private var todoItemList: List<Todo>?) :
         todoItem?.done?.let { holder.select.isChecked = it }
         holder.todoContent.setText(todoItem?.content ?: "")
 
+        holder.todoContent.doOnTextChanged { text, _, _, _ ->
+            todoItem?.content = text.toString()
+        }
+
         holder.select.setOnCheckedChangeListener { _, isChecked ->
             todoItem?.done = isChecked
             if (isChecked) {
@@ -77,5 +82,7 @@ class TodoItemAdapter(private var todoItemList: List<Todo>?) :
         todoItemList = value
         notifyDataSetChanged()
     }
+
+    fun getTodoItemList() = todoItemList
 
 }

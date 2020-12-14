@@ -100,7 +100,7 @@ class TodoFragment : Fragment() {
         toolbar_todo.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.btn_save -> {
-                    todoList.value!!.value!!.forEach { todo ->
+                    todoItemAdapter.getTodoItemList()?.forEach { todo ->
                         GlobalScope.launch(Dispatchers.IO) {
                             todoRepository.update(todo)
                         }
